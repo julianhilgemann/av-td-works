@@ -7,7 +7,7 @@ Audiovisual TouchDesigner works. Each folder is a standalone project: open the `
 | `time-series-wavetable/` | The Bundesbank housing-loan series turned into a playable wavetable synth with a live dashboard. |
 | `touch-the-sonogram/` | An installation: the same wavetable drone, shaped by a camera and a microphone and drawn as a point-cloud sonogram. |
 | `caleidoscopic-sonogram-video/` | A square music video: the sonogram point cloud driven by an audio track and a modulator video. |
-| `ferroscope/` | Sound as ferrofluid: a spike lattice raised by a kaleidoscope-folded sonogram, leaning toward the viewer on camera. Includes a reusable CRT filter (`components/CRT.tox`); its Output page frames, shares and records the picture. |
+| `ferroscope/` | Sound as ferrofluid: a spike lattice raised by a kaleidoscope-folded sonogram, leaning toward the viewer on camera, through the shared CRT filter. Its Output page frames, shares and records the picture. |
 | `audioreactive-pointcloud/` | An audio-reactive point cloud. |
 | `color-ribbon-butterfly/` | 250,000 instanced hexagons placed by animated 4D simplex noise, smeared into colored ribbons by feedback, RGBA delay and a radial blur. |
 | `infinite-hypercube/` | 262,144 points carried by a self-displacing noise field inside a cube whose faces wrap around, with trails, depth blur and RGBA delay. |
@@ -19,7 +19,7 @@ Audiovisual TouchDesigner works. Each folder is a standalone project: open the `
 
 ## Shared modules
 
-`00-custom-modules/` holds components that projects load as External .tox: `source_deck` (camera, file and YouTube sources with a transport), `audio_analyzer`, `midi_analyzer`, `modulator`, `av_rig`, which combines those three, and `output_deck` (framing for a phone, a TV or any size, Spout/Syphon to OBS, and movie recording). Projects find them at `../00-custom-modules/`, so keep the folder beside them. Its README covers using and changing modules.
+`00-custom-modules/` holds components that projects load as External .tox: `source_deck` (camera, file and YouTube sources with a transport), `audio_analyzer`, `midi_analyzer`, `modulator`, `av_rig`, which combines those three, `output_deck` (framing for a phone, a TV or any size, Spout/Syphon to OBS, and movie recording) and `crt_filter` (a CRT tube and analog-signal look for any TOP). Projects find them at `../00-custom-modules/`, so keep the folder beside them. Its README covers using and changing modules.
 
 ## Embody
 

@@ -129,3 +129,21 @@ Choices that followed:
 - **Recording settings are applied when a take starts.** The recorder writes the file name, codec, container, frame rate, bit rate and audio onto the Movie File Out then, instead of keeping per-frame expressions on it. It falls back to MPEG-4 when the licence refuses NVIDIA encoding, and reports Failed when the operator errors or writes no frames.
 - **Size follows the licence.** The deck computes the requested size, scales it to the 1280 limit on Non-Commercial with its shape kept, and says so in a readout. The same project settings then render the full size on a Pro machine.
 - **Runtime readouts stay out of git.** The deck ships `tdxn_exclude:Outputsize` and `tdxn_exclude:Recordstatus`, and the host tags its bound copies the same way.
+
+## 9. Promoting a COMP that is already self-contained
+
+From turning ferroscope's CRT filter into `crt-filter/`. The CRT already had its own parameters, presets table and callback, and nothing in the host read or bound its parameters, so the COMP itself became the module: steps 3 to 6 of the fast path fall away (no new COMP, no copied ops, no binds). Measured on TouchDesigner 2025.32820 with Embody 6.2.72:
+
+| What | What happens |
+|---|---|
+| A COMP the host's Embody tracks as its own `.tdxn` | `remove_externalization_tag(op, delete_file=True)` removes the tag, the `externalizations.tsv` row, the `_tdn_rel_path` storage entry and the file. |
+| Reload Custom Parameters off, nothing bound | The instance kept all 47 of its non-default values across a reload from a `.tox` saved with defaults. The project's look now lives only on the instance in the `.toe`: the instance is `tdxn_exclude`, so no text file holds it. |
+| Renaming an operator in an `execute_python` that then fails | Envoy's rollback takes the new name for an operator the script created, and destroys it. `ui.undo.undoStack` names the steps; one `ui.undo.undo()`, run a frame later outside Envoy's own undo block, brought the COMP back with its wires and values. Tags, comment and DAT text kept the failed call's edits, the colour went to TD's default grey, and values came back rounded to their displayed text (0.073, not 0.0729999989). Rename with `rename_op`, in a call of its own, after the other edits succeed, and resolve and check every lookup before the first change. |
+| `comp.op('annotate1')` | Returns `None`: `op()` doesn't find annotations. `comp.findChildren(name='annotate1', maxDepth=1, includeUtility=True)` does. |
+| Annotations after a `.tox` save and load | Their `utility` flag is off (`copy()` keeps it). Every module's annotations show this; nothing visible changes. |
+
+Choices that followed:
+
+- **The parent shortcut stays `CRT`**, so none of the expressions inside changed. The COMP is renamed `crt_filter`, like the other module instances.
+- **The Apply Preset callback became the module's one dispatcher**, `module_callbacks`, with Save Module beside it.
+- **ferroscope keeps its CRT look on the instance**, not on a host page. Binding all 59 parameters to a ferroscope page would put the look back in the host's `.tdxn`, at the cost of a new panel page and about 500 lines (the size of the parameter block `CRT.tdxn` had).

@@ -140,7 +140,7 @@ custom_pars:
     label: YouTube Video Link
     startSection: true
     help: A YouTube link (watch, youtu.be or shorts URL) whose picture becomes the video source. Press Download Video to fetch it.
-    value: https://www.youtube.com/watch?v=MtkHmdezGUs
+    value: https://www.youtube.com/watch?v=_Sl8diqCAFw
   - name: Videodownload
     style: Pulse
     label: Download Video
@@ -150,13 +150,13 @@ custom_pars:
     label: Video Download
     readOnly: true
     help: Progress of the YouTube video download, the title once it is ready, or why it failed.
-    value: 'Ready: Oscar Mulero at Intercell x Yanamaste Invites | ADE 2025'
+    value: 'Ready: 4K Planet Earth Spinning in Space | Free HD Videos - No Copyright'
   - name: Videodownloaded
     style: File
     label: Downloaded Video
     readOnly: true
     help: The downloaded YouTube video file that Video Source YouTube plays (set by Download Video).
-    value: media/youtube/MtkHmdezGUs.video.mp4
+    value: media/youtube/_Sl8diqCAFw.video.mp4
   - name: Audiosource
     style: Menu
     label: Audio Source
@@ -173,7 +173,7 @@ custom_pars:
     - External Input
     - YouTube
     help: 'What feeds the sonogram: the microphone, an audio file, any CHOP wired into FerroScope''s audio input from outside, or the audio downloaded from the YouTube Audio Link (heard through Play to Speakers).'
-    value: youtube
+    value: file
   - name: Audiofile
     style: File
     label: Audio File
@@ -184,7 +184,7 @@ custom_pars:
     label: YouTube Audio Link
     startSection: true
     help: A YouTube link whose sound feeds the sonogram and the speakers. Leave it empty to use the YouTube Video Link, so one clip gives both picture and sound. Press Download Audio to fetch it.
-    value: https://www.youtube.com/watch?v=MtkHmdezGUs
+    value: https://www.youtube.com/watch?v=_Sl8diqCAFw
   - name: Audiodownload
     style: Pulse
     label: Download Audio
@@ -194,13 +194,13 @@ custom_pars:
     label: Audio Download
     readOnly: true
     help: Progress of the YouTube audio download, the title once it is ready, or why it failed.
-    value: 'Ready: Oscar Mulero at Intercell x Yanamaste Invites | ADE 2025'
+    value: 'Ready: 4K Planet Earth Spinning in Space | Free HD Videos - No Copyright'
   - name: Audiodownloaded
     style: File
     label: Downloaded Audio
     readOnly: true
     help: The downloaded YouTube audio file that Audio Source YouTube plays (set by Download Audio).
-    value: media/youtube/MtkHmdezGUs.audio.m4a
+    value: media/youtube/_Sl8diqCAFw.audio.m4a
   - name: Monitor
     style: Toggle
     label: Play to Speakers
@@ -245,7 +245,7 @@ custom_pars:
     style: Float
     label: Video Position
     clampMin: true
-    normMax: 3626.0
+    normMax: 16.0
     help: Playhead of the movie file or YouTube video in seconds; drag to scrub, or type a time. The slider spans the whole clip. While the audio is linked the audio jumps with it.
   - name: Videoclock
     style: Str
@@ -280,7 +280,7 @@ custom_pars:
     style: Float
     label: Audio Position
     clampMin: true
-    normMax: 3626.0
+    normMax: 71.0
     help: Playhead of the audio file or YouTube audio in seconds; drag to scrub, or type a time. The slider spans the whole file. While the audio is linked the video jumps with it.
   - name: Audioclock
     style: Str
@@ -371,6 +371,7 @@ custom_pars:
     - Stretch
     - Native Size
     help: 'How the picture fills the output when their shapes differ: Fit Inside shows all of it with background around it, Fill covers the output and crops, Stretch distorts it to the output''s shape, Native Size keeps its own pixel size.'
+    value: native
   - name: Picturezoom
     style: Float
     label: Picture Zoom
@@ -437,6 +438,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: 'How much of the blurred or mirrored picture shows in the background: 0 is the plain Background Colour, 1 the picture at full brightness.'
+    value: 0.4099999964
   - name: Blendmode
     style: Menu
     label: Blend
@@ -452,6 +454,7 @@ custom_pars:
     - Screen
     - Lighten
     help: 'How the picture sits on the background: Over covers it, Add and Screen let the background show through the picture''s dark parts (for glowing visuals on black), Lighten keeps the brighter of the two.'
+    value: lighten
   - name: Share
     style: Toggle
     label: Send to OBS (Spout/Syphon)
@@ -498,6 +501,7 @@ custom_pars:
     - MPEG-4 (.mp4)
     - Apple ProRes (.mov)
     help: H.264 plays everywhere and H.265 makes smaller files; both encode on an NVIDIA GPU and need a Commercial or Pro licence, so on a Non-Commercial licence they record as MPEG-4 instead. MPEG-4 writes a larger .mp4 on any licence; Apple ProRes writes a large .mov for editing.
+    value: mpeg4
   - name: Recordquality
     style: Menu
     label: Quality
@@ -656,7 +660,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: 1 = every octave gets the same width (musical, bass spread out). 0 = linear Hz (treble takes most of the width).
-    value: 0.904
+    value: 0.3070000112
   - name: Specstart
     style: Float
     label: Spectrum Start
@@ -665,7 +669,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Where the shown frequency range starts on the logarithmic spectrum, 0 = lowest frequency. Raise it to drop rumble.
-    value: 1
+    value: 0
   - name: Specend
     style: Float
     label: Spectrum End
@@ -717,7 +721,7 @@ custom_pars:
     normMin: 0.25
     normMax: 4.0
     help: How many sonogram rows scroll down per frame (top = newest sound). 1 shows about 4 seconds of history; fractional values scroll on some frames only.
-    value: 0.25
+    value: 0.9700000286
   - name: Timeflow
     style: Menu
     label: Time Flow
@@ -746,7 +750,7 @@ custom_pars:
     normMin: 0.3
     normMax: 3.0
     help: Gamma on loudness. Above 1 only loud sounds stand out; below 1 quiet sounds show more.
-    value: 2.02
+    value: 1.6419999599
   - name: Onsetboost
     style: Float
     label: Onset Punch
@@ -809,7 +813,7 @@ custom_pars:
     normMin: 0.25
     normMax: 3.0
     help: Gamma from loudness to colour. Below 1 colours quiet sounds early; above 1 keeps colour for loud sounds only.
-    value: 0.25
+    value: 1.006000042
   - name: Peakthreshold
     style: Float
     label: Peak Threshold
@@ -818,7 +822,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Loudness (0-1) at which a frequency reaches its full colour; above it the colour heads toward Peak Color.
-    value: 0.05
+    value: 0.6930000186
   - name: Peakmix
     style: Float
     label: Peak Mix
@@ -826,7 +830,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: How far the loudest sounds blend into Peak Color. 0 keeps pure frequency colours.
-    value: 0.699
+    value: 0.4460000098
   Fluid:
   - name: Gridshape
     style: Menu
@@ -850,14 +854,14 @@ custom_pars:
     normMin: 12.0
     normMax: 100.0
     help: Number of spikes across the width of the image.
-    value: 12
+    value: 22.1000003815
   - name: Gridrotate
     style: Float
     label: Grid Rotation
     min: -180.0
     max: 180.0
     help: Rotation of the spike lattice, in degrees.
-    value: 0.307
+    value: 0.0909999982
   - name: Cellrandom
     style: Float
     label: Cell Randomness
@@ -954,7 +958,7 @@ custom_pars:
     normMin: 0.002
     normMax: 0.3
     help: How much neighbouring spikes melt together at their bases.
-    value: 0.3
+    value: 0.2870000005
   - name: Subgrid
     style: Float
     label: Sub-Grid
@@ -988,6 +992,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: 'Inertia of the liquid: spikes rise and fall sluggishly. 0 = instant.'
+    value: 0.5419999957
   - name: Ripples
     style: Float
     startSection: true
@@ -1033,7 +1038,7 @@ custom_pars:
     clampMax: true
     normMax: 2.0
     help: How far the liquid surface and spike positions sway.
-    value: 0.46
+    value: 0.2399999946
   - name: Warpscale
     style: Float
     label: Warp Scale
@@ -1131,7 +1136,7 @@ custom_pars:
     normMin: 1.0
     normMax: 12.0
     help: Number of mirrored wedge pairs around the centre. 6 matches the hexagonal grid.
-    value: 11
+    value: 9
   - name: Zoom
     style: Float
     default: 0.7
@@ -1166,7 +1171,7 @@ custom_pars:
     normMin: -20.0
     normMax: 20.0
     help: Rotation speed of the kaleidoscope, in degrees per second.
-    value: -0.2
+    value: 3.5999999046
   - name: Spinreact
     style: Float
     label: Spin Reactivity
@@ -1211,7 +1216,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Below 1 bulges the centre outward like a fisheye, above 1 pulls it in.
-    value: 0.3
+    value: 0.6269999743
   - name: Rings
     style: Float
     startSection: true
@@ -1220,7 +1225,7 @@ custom_pars:
     clampMax: true
     normMax: 12.0
     help: Split the kaleidoscope into concentric rings that rotate against each other. 0 = off.
-    value: 11.93
+    value: 6.2899999619
   - name: Ringspin
     style: Float
     label: Ring Spin (deg/s)
@@ -1307,7 +1312,7 @@ custom_pars:
     clampMax: true
     normMax: 3.0
     help: 'How strongly the viewer pulls the fluid: spikes rise and lean toward where you are.'
-    value: 1.81
+    value: 1.8799999952
   - name: Lens
     style: Float
     default: 1
@@ -1316,7 +1321,7 @@ custom_pars:
     clampMax: true
     normMax: 2.0
     help: How much the fluid bulges and magnifies toward the viewer, as if coming out of the screen.
-    value: 2
+    value: 0.8399999738
   - name: Follow
     style: Float
     default: 0.6
@@ -1342,7 +1347,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Share of the camera image you must fill to count as fully close. Lower values reach full proximity from further away.
-    value: 0.717
+    value: 0.1389999986
   - name: Sensitivity
     style: Float
     startSection: true
@@ -1368,7 +1373,6 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Strength of movement (frame-to-frame change) in the pull field, so moving hands pull hardest.
-    value: 0.548
   - name: Relearnbg
     style: Pulse
     label: Relearn Background
@@ -1390,13 +1394,14 @@ custom_pars:
     clampMax: true
     normMax: 1.5
     help: 'How far the camera picture protrudes from the fluid: bright parts rise out of the surface.'
+    value: 1.5
   - name: Imgspikes
     style: Float
     label: Image Spikes
     clampMin: true
     clampMax: true
     help: How much the camera picture sets the spike heights. At 1 the spikes draw the picture like a halftone.
-    value: 1
+    value: 0.4620000124
   - name: Imgsource
     style: Menu
     label: Image Source
@@ -1433,7 +1438,7 @@ custom_pars:
     clampMax: true
     normMax: 3.0
     help: Contrast of the picture before it shapes the fluid.
-    value: 0
+    value: 3
   - name: Imginvert
     style: Toggle
     label: Invert Image
@@ -1447,7 +1452,7 @@ custom_pars:
     clampMax: true
     normMax: 15.0
     help: Blur of the camera picture, in pixels. Softer = smoother relief.
-    value: 14.91
+    value: 0
   - name: Imgkaleido
     style: Toggle
     label: Image Through Kaleidoscope
@@ -1472,7 +1477,7 @@ custom_pars:
     normMin: 8.0
     normMax: 200.0
     help: Sharpness of the specular highlights. Ferrofluid is a near-mirror, so this sits high.
-    value: 195
+    value: 200
   - name: Reflection
     style: Float
     default: 1
@@ -1491,7 +1496,7 @@ custom_pars:
     clampMax: true
     normMax: 4.0
     help: Brightness of the sound colours reflected on the spike flanks.
-    value: 3.86
+    value: 2.8199999332
   - name: Bodycolor
     style: Float
     label: Body Color
@@ -1531,7 +1536,7 @@ custom_pars:
     clampMax: true
     normMax: 3.0
     help: Brightness of the white softbox highlight on the spikes.
-    value: 1.61
+    value: 1.2460000515
   - name: Keycolor
     style: RGBA
     label: Key Color
@@ -1614,19 +1619,6 @@ storage:
     - 'Ready: Oscar Mulero at Intercell x Yanamaste Invites | ADE 2025'
     - 1414.6
 operators:
-- name: CRT
-  type: baseCOMP
-  parameters:
-    parentshortcut: CRT
-  position: [5600, 0]
-  size: [160, 130]
-  color: [0.3, 0.5, 0.9]
-  comment: 'Reusable CRT filter: TOP in -> analog signal + tube emulation -> TOP out. Portable copy: components/CRT.tox'
-  tags:
-  - tdxn
-  inputs:
-  - tonemap_out
-  tdn_ref: project1/ferroscope/CRT.tdxn
 - name: out1
   type: outTOP
   parameters:
@@ -2002,7 +1994,7 @@ operators:
   type: nullTOP
   position: [6000, 0]
   inputs:
-  - CRT
+  - crt_filter
 - name: null_level
   type: nullCHOP
   position: [1200, -1000]
@@ -2323,7 +2315,7 @@ annotations:
 - name: annotate4
   mode: annotate
   title: Ferrofluid Render and Output
-  text: 'glsl_fluid (GLSL Multi): hex or square spike lattice with honeycomb ridges and a nested sub-grid; heights and colours from the kaleidoscope-folded sonogram (8 modes); liquid warp and swirl; raised, leaned and lensed toward the viewer; camera picture as colour, relief or spikes; feedback_fluid feeds back the last frame for viscosity. glsl_shade: black glossy body, white key highlight, sound-coloured rim, tip glow, sonogram glow. bloom -> ACES tone map -> CRT (reusable filter) -> out1; window_out shows null_final in its own window; controls_callbacks handles the pulse buttons and forwards the source and transport ones to source_deck.'
+  text: 'glsl_fluid (GLSL Multi): hex or square spike lattice with honeycomb ridges and a nested sub-grid; heights and colours from the kaleidoscope-folded sonogram (8 modes); liquid warp and swirl; raised, leaned and lensed toward the viewer; camera picture as colour, relief or spikes; feedback_fluid feeds back the last frame for viscosity. glsl_shade: black glossy body, white key highlight, sound-coloured rim, tip glow, sonogram glow. bloom -> ACES tone map -> crt_filter -> out1. crt_filter is the shared CRT module, loaded from ../00-custom-modules/crt-filter/crt_filter.tox (External .tox, Reload Custom Parameters off, so its look stays in this project; tagged tdxn_exclude, its own text lives beside its .tox); window_out shows null_final in its own window; controls_callbacks handles the pulse buttons and forwards the source and transport ones to source_deck.'
   position: [3130, -670]
   size: [3500, 970]
   color: [0.45, 0.3, 0.2]
