@@ -297,6 +297,245 @@ custom_pars:
     style: Pulse
     label: Restart Audio
     help: Jump the audio back to the start. While the audio is linked the video jumps with it.
+  Output:
+  - name: Outputformat
+    style: Menu
+    label: Output Format
+    default: input
+    menuNames:
+    - input
+    - hd720
+    - hd1080
+    - uhd4k
+    - phone
+    - iphone
+    - square
+    - portrait45
+    - custom
+    menuLabels:
+    - Same as Input
+    - HD 720p (1280 x 720)
+    - Full HD 1080p (1920 x 1080)
+    - 4K UHD TV (3840 x 2160)
+    - Phone 9:16 (1080 x 1920)
+    - iPhone Full Screen (1179 x 2556)
+    - Square (1080 x 1080)
+    - Portrait 4:5 (1080 x 1350)
+    - Custom Size
+    help: The size of the shared and recorded picture. Same as Input keeps the picture's own size; the phone formats are portrait; Custom Size uses Custom Width and Custom Height.
+  - name: Swapsize
+    style: Toggle
+    label: Swap Width and Height
+    help: 'Turns the chosen format on its side: landscape becomes portrait (a TV hung upright) and portrait becomes landscape.'
+  - name: Outputwidth
+    style: Int
+    label: Custom Width
+    startSection: true
+    default: 1920
+    min: 16.0
+    max: 8192.0
+    clampMin: true
+    clampMax: true
+    normMin: 256.0
+    normMax: 3840.0
+    help: Output width in pixels when Output Format is Custom Size.
+  - name: Outputheight
+    style: Int
+    label: Custom Height
+    default: 1080
+    min: 16.0
+    max: 8192.0
+    clampMin: true
+    clampMax: true
+    normMin: 256.0
+    normMax: 3840.0
+    help: Output height in pixels when Output Format is Custom Size.
+  - name: Outputsize
+    style: Str
+    label: Output Size
+    startSection: true
+    readOnly: true
+    help: The size being shared and recorded. A Non-Commercial licence limits the longest side to 1280 pixels, so a larger format is rendered smaller at the same shape; a Commercial or Pro licence renders the full size. Read only.
+  - name: Picturefit
+    style: Menu
+    label: Picture Fit
+    default: fit
+    menuNames:
+    - fit
+    - fill
+    - stretch
+    - native
+    menuLabels:
+    - Fit Inside
+    - Fill (crop)
+    - Stretch
+    - Native Size
+    help: 'How the picture fills the output when their shapes differ: Fit Inside shows all of it with background around it, Fill covers the output and crops, Stretch distorts it to the output''s shape, Native Size keeps its own pixel size.'
+  - name: Picturezoom
+    style: Float
+    label: Picture Zoom
+    default: 1
+    min: 0.1
+    max: 4.0
+    clampMin: true
+    clampMax: true
+    normMin: 0.25
+    normMax: 2.0
+    help: 'Scales the fitted picture: 1 is the fitted size, below 1 leaves more background around it.'
+  - name: Pictureoffset
+    style: XYZW
+    label: Picture Position
+    size: 2
+    min: [-1.0, 0.0]
+    normMin: [-1.0, 0.0]
+    help: 'Moves the picture''s centre across the output: 0 0 is the middle, -1 the left (or bottom) edge, 1 the right (or top) edge.'
+  - name: Softedge
+    style: Float
+    label: Soft Edge
+    startSection: true
+    default: 0.1
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    normMax: 0.5
+    help: Fades the picture's edges into the background over this share of its shorter side, so a picture smaller than the output blends in instead of ending in a hard border. Edges that touch the border of the output stay sharp. 0 is a hard edge.
+  - name: Edgeshape
+    style: Menu
+    label: Edge Shape
+    default: rect
+    menuNames:
+    - rect
+    - oval
+    menuLabels:
+    - Rectangle
+    - Oval
+    help: 'The shape the soft edge follows: Rectangle fades the picture''s sides, Oval fades it into a round vignette.'
+  - name: Background
+    style: Menu
+    startSection: true
+    default: color
+    menuNames:
+    - color
+    - blur
+    - mirror
+    - transparent
+    menuLabels:
+    - Solid Colour
+    - Blurred Picture
+    - Mirrored Picture
+    - Transparent
+    help: 'What fills the output around the picture: a solid colour, the picture itself blurred to cover the output, the picture mirrored outward from its edges, or nothing (transparent, for layering in OBS; a movie file has no transparency).'
+  - name: Backgroundcolor
+    style: RGBA
+    label: Background Colour
+    size: 3
+    help: Colour of the background. With Blurred or Mirrored Picture it is mixed with the picture by Picture in Background.
+  - name: Backgroundlevel
+    style: Float
+    label: Picture in Background
+    default: 0.35
+    clampMin: true
+    clampMax: true
+    help: 'How much of the blurred or mirrored picture shows in the background: 0 is the plain Background Colour, 1 the picture at full brightness.'
+  - name: Blendmode
+    style: Menu
+    label: Blend
+    default: over
+    menuNames:
+    - over
+    - add
+    - screen
+    - lighten
+    menuLabels:
+    - Over
+    - Add
+    - Screen
+    - Lighten
+    help: 'How the picture sits on the background: Over covers it, Add and Screen let the background show through the picture''s dark parts (for glowing visuals on black), Lighten keeps the brighter of the two.'
+  - name: Share
+    style: Toggle
+    label: Send to OBS (Spout/Syphon)
+    help: Shares the output as a Spout sender (Windows) or a Syphon server (macOS). In OBS, add a Spout2 Capture source (the obs-spout2-plugin) on Windows or a Syphon Client source on macOS, and pick Sender Name.
+  - name: Sendername
+    style: Str
+    label: Sender Name
+    default: TouchDesigner
+    help: The name OBS and other apps see for this output.
+    value: FerroScope
+  - name: Record
+    style: Toggle
+    help: Records the output to a movie while on. Every take is a new file in the Recordings Folder, named after Recording Name (or the project) and the date and time it started.
+  - name: Recordtiming
+    style: Menu
+    label: Timing
+    default: exact
+    menuNames:
+    - exact
+    - live
+    menuLabels:
+    - Frame-Exact
+    - Live
+    help: 'Frame-Exact puts every frame in the movie even when one takes longer than real time to render: TD''s Realtime flag is off while recording, so the movie''s picture and sound stay smooth while the speakers, a camera or a microphone fall out of step. Live records as it plays, and frames TD drops are repeated in the movie.'
+  - name: Recordlength
+    style: Float
+    label: Stop After
+    clampMin: true
+    normMax: 600.0
+    help: Stops the take after this many seconds of movie. 0 records until Record is turned off.
+  - name: Recordcodec
+    style: Menu
+    label: Codec
+    startSection: true
+    default: h264
+    menuNames:
+    - h264
+    - h265
+    - mpeg4
+    - prores
+    menuLabels:
+    - H.264 (.mp4)
+    - H.265 / HEVC (.mp4)
+    - MPEG-4 (.mp4)
+    - Apple ProRes (.mov)
+    help: H.264 plays everywhere and H.265 makes smaller files; both encode on an NVIDIA GPU and need a Commercial or Pro licence, so on a Non-Commercial licence they record as MPEG-4 instead. MPEG-4 writes a larger .mp4 on any licence; Apple ProRes writes a large .mov for editing.
+  - name: Recordquality
+    style: Menu
+    label: Quality
+    default: high
+    menuNames:
+    - standard
+    - high
+    - max
+    menuLabels:
+    - Standard
+    - High
+    - Very High
+    help: 'Video bit rate for H.264, H.265 and MPEG-4, scaled to the output size and frame rate: about 0.1, 0.2 and 0.35 bits per pixel. High is about 25 Mb/s at 1080 x 1920 and 60 fps.'
+  - name: Recordaudio
+    style: Toggle
+    label: Record Audio
+    default: true
+    help: Adds the audio input to the movie (AAC). Off records the picture only.
+  - name: Recordfolder
+    style: Folder
+    label: Recordings Folder
+    startSection: true
+    default: media/exports
+    help: Folder the takes are written to, relative to the project folder unless absolute. Keep it out of git (media/ is ignored in this repo).
+  - name: Recordname
+    style: Str
+    label: Recording Name
+    help: File name of each take, before its date and time. Empty uses the project's name.
+  - name: Openrecordings
+    style: Pulse
+    label: Open Recordings Folder
+    help: Opens the Recordings Folder in the file browser.
+  - name: Recordstatus
+    style: Str
+    label: Recording
+    startSection: true
+    readOnly: true
+    help: 'What the recorder is doing: the file and length of the take in progress, or the last file saved. Read only.'
   Sound:
   - name: Audioactive
     style: Toggle
@@ -1068,7 +1307,7 @@ custom_pars:
     clampMax: true
     normMax: 3.0
     help: 'How strongly the viewer pulls the fluid: spikes rise and lean toward where you are.'
-    value: 1.8099999428
+    value: 1.81
   - name: Lens
     style: Float
     default: 1
@@ -1111,7 +1350,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: How different from the empty room a pixel must be to count as you. Raise it in a dim room or with a plain background.
-    value: 0.4280000031
+    value: 0.428
   - name: Presenceweight
     style: Float
     label: Presence Weight
@@ -1129,7 +1368,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Strength of movement (frame-to-frame change) in the pull field, so moving hands pull hardest.
-    value: 0.5479999781
+    value: 0.548
   - name: Relearnbg
     style: Pulse
     label: Relearn Background
@@ -1363,6 +1602,8 @@ tags:
 - tdxn_exclude:Audioclock
 - tdxn_exclude:Audiotime
 - tdxn_exclude:Linked
+- tdxn_exclude:Outputsize
+- tdxn_exclude:Recordstatus
 - tdxn_exclude:Videoclock
 - tdxn_exclude:Videotime
 comment: Mic sonogram -> kaleidoscopic ferrofluid; webcam presence pulls the fluid toward the viewer.
@@ -1515,8 +1756,12 @@ operators:
       valuex: =parent.Ferro.par.Autogain
       valuey: =parent.Ferro.par.Recovery / me.time.rate
       valuez: =parent.Ferro.par.Silence
+      valuew: 1
     - name: uSmooth2
       valuex: =parent.Ferro.par.Freqsmooth
+      valuey: 1
+      valuez: 1
+      valuew: 1
   position: [1600, 0]
   inputs:
   - feedback_sono
@@ -1622,7 +1867,7 @@ operators:
       valuex: =parent.Ferro.par.Colorcurve
       valuey: =parent.Ferro.par.Peakthreshold
       valuez: =parent.Ferro.par.Peakmix
-      valuew: =me.width / me.height
+      valuew: =me.par.resolutionw / me.par.resolutionh
     - name: uKal2
       valuex: =parent.Ferro.par.Pinch
       valuey: =parent.Ferro.par.Rings
@@ -1660,6 +1905,9 @@ operators:
       valuew: =math.radians(parent.Ferro.par.Swirl)
     - name: uWarp2
       valuex: =parent.Ferro.par.Swirlradius
+      valuey: 1
+      valuez: 1
+      valuew: 1
     - name: uSono
       valuex: =parent.Ferro.par.Bands
       valuey: =parent.Ferro.par.Freqlayout.menuIndex
@@ -1668,6 +1916,8 @@ operators:
     - name: uSono2
       valuex: =parent.Ferro.par.Onsetboost
       valuey: =min(1.0, float(op('null_level')[0]) * 10)
+      valuez: 1
+      valuew: 1
     - name: uImg
       valuex: =parent.Ferro.par.Imgvisible * parent.Ferro.par.Videoactive
       valuey: =parent.Ferro.par.Imgrelief * parent.Ferro.par.Videoactive
@@ -1678,6 +1928,10 @@ operators:
       valuey: =parent.Ferro.par.Imginvert
       valuez: =parent.Ferro.par.Imgkaleido
       valuew: =parent.Ferro.par.Imggain
+    - {}
+    - {}
+    - {}
+    - {}
   position: [4000, 0]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
@@ -1717,6 +1971,9 @@ operators:
       valuew: =parent.Ferro.par.Lightfollow * parent.Ferro.par.Videoactive * tdu.clamp(float(op('null_viewer')['mass']) * 20, 0, 1)
     - name: uExtra
       valuex: =parent.Ferro.par.Sonoglow
+      valuey: 1
+      valuez: 1
+      valuew: 1
   position: [4400, 0]
   inputs:
   - glsl_fluid
@@ -1841,6 +2098,14 @@ operators:
   color: [0.67, 0.67, 0.67]
   inputs:
   - bloom_glow
+- name: select_audio
+  type: selectCHOP
+  parameters:
+    chops: null_audio
+    autoexportroot: =parent()
+  position: [7200, -200]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
 - name: spectrum_tex
   type: choptoTOP
   parameters:
@@ -2007,7 +2272,7 @@ operators:
   parameters:
     fromop: =parent()
     op: ..
-    pars: Resetsono Relearnbg Openwindow Closewindow Videorestart Audiorestart Videodownload Audiodownload Applypreset Storepreset
+    pars: Resetsono Relearnbg Openwindow Closewindow Videorestart Audiorestart Videodownload Audiodownload Openrecordings Applypreset Storepreset
     valuechange: false
     builtin: false
     file: project1/ferroscope/controls_callbacks.py
@@ -2069,5 +2334,13 @@ annotations:
   text: 'source_deck is the shared sources-and-transport module, loaded from ../00-custom-modules/source-deck/source_deck.tox (External .tox, Reload Custom Parameters off, so its settings stay in this project). Its parameters are bound to FerroScope''s Sources and Transport pages plus Camera On and Microphone On, so this panel drives it; controls_callbacks forwards the Restart and Download pulses. It is tagged tdxn_exclude: the module''s own text lives beside its .tox. Video out -> null_video, audio out -> null_audio.'
   position: [-1670, -1070]
   size: [1270, 400]
+  color: [0.2, 0.4, 0.3]
+  opacity: 0.6
+- name: annotate6
+  mode: annotate
+  title: Output Deck (shared module)
+  text: 'output_deck is the shared output module, loaded from ../00-custom-modules/output-deck/output_deck.tox (External .tox, Reload Custom Parameters off, so its settings stay in this project). It frames null_final to the output size, shares it to OBS (Spout/Syphon) and records it, with the sound select_audio picks up from null_audio. Its parameters are bound to FerroScope''s Output page; controls_callbacks forwards Open Recordings Folder. Tagged tdxn_exclude: the module''s own text lives beside its .tox.'
+  position: [7130, -270]
+  size: [700, 570]
   color: [0.2, 0.4, 0.3]
   opacity: 0.6

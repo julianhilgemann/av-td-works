@@ -950,6 +950,8 @@ operators:
     - name: uGrade
       valuex: =parent.CRT.par.Contrast
       valuey: =parent.CRT.par.Gamma
+      valuez: 1
+      valuew: 1
   position: [1200, 0]
   inputs:
   - glsl_signal
@@ -988,6 +990,9 @@ operators:
       valuew: =parent.CRT.par.Flicker
     - name: uDir
       valuex: =parent.CRT.par.Scandir.menuIndex
+      valuey: 1
+      valuez: 1
+      valuew: 1
   position: [400, 0]
   inputs:
   - in1

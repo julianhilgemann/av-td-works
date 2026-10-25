@@ -31,11 +31,11 @@ def _closeWindow(comp):
 	"""Close the output window."""
 	comp.op('window_out').par.winclose.pulse()
 
-def _deckPulse(name):
-	"""A handler that presses the same pulse on source_deck, the shared module that owns the
-	sources, the YouTube downloads and the transport."""
+def _deckPulse(name, deck='source_deck'):
+	"""A handler that presses the same pulse on a shared module: source_deck (sources, YouTube
+	downloads, transport) or output_deck (framing, sharing, recording)."""
 	def press(comp):
-		comp.op('source_deck').par[name].pulse()
+		comp.op(deck).par[name].pulse()
 	return press
 
 def _refreshPresetMenu(comp):
@@ -95,6 +95,7 @@ _PULSES = {
 	'Audiorestart': _deckPulse('Audiorestart'),
 	'Videodownload': _deckPulse('Videodownload'),
 	'Audiodownload': _deckPulse('Audiodownload'),
+	'Openrecordings': _deckPulse('Openrecordings', 'output_deck'),
 	'Applypreset': _applyPreset,
 	'Storepreset': _storePreset,
 }

@@ -76,7 +76,7 @@ Decisions already made (section 5 says why). Steps in order:
 
 - Load the released `.tox` into `/sys/quiet`, then delete it. Expect the right tags (`tdxn_exclude`), the right child count (`findChildren(maxDepth=1, includeUtility=True)`), and an empty `[p for p in comp.customPars if p.bindExpr or p.expr]`.
 - Each generated `.py` minus its 3 header lines equals the live DAT text.
-- `get_op_errors` on the host returns 0 errors. Ferroscope's `glsl_fluid` cook-loop warning is older and unrelated: its uniform reads `me.width / me.height`.
+- `get_op_errors` on the host returns 0 errors and 0 warnings. (Ferroscope's old `glsl_fluid` cook-loop warning is fixed: a uniform read `me.width / me.height`, its own output size; it now reads `me.par.resolutionw / me.par.resolutionh`.)
 - `get_project_performance`: fps and dropped frames unchanged. Memory can briefly rise after test loads and comes back down.
 - After the user's Ctrl+S, `diff_tdxn` returns `changed_count: 0`.
 
@@ -102,3 +102,30 @@ Choices that followed:
 - **Save Module writes tables as `.tsv`** next to the `.py` files, and skips DATs tagged `tdxn_exclude:dat_content` (MIDI logs, generated channel names).
 - **The rig shows the modules' parameters on its own pages** (copied with `appendPar(name, par=...)`, so style, range and menu match) and binds the modules to them. Pulses are pressed from the rig's `module_callbacks`. OP-type parameters use expressions, not binds.
 - **One fresh-load test per module before the next one depends on it**: load the saved `.tox`, expect 0 errors and signal at the outputs, delete it. Then a reload of the host's rig instance (`enableexternaltoxpulse`) to prove the project's values, mapping, bases and knob memory survive.
+
+## 8. Output modules: sharing and recording
+
+From building `output-deck/` as a new module (not an extraction) in ferroscope. Measured on TouchDesigner 2025.32820 with a Non-Commercial licence and an NVIDIA RTX 5060 laptop GPU:
+
+| What | What happens |
+|---|---|
+| H.264, H.265 or AV1 in a Movie File Out on Non-Commercial | Refused while recording: "GPU Accelerated H.264/H.265 Encoding requires a Commercial license". No file is written, and nothing is reported until the TOP cooks with Record on. Derivative's Licensing page suggests otherwise; trust the operator. |
+| MPEG-4 (Part 2), ProRes, VP9, Motion JPEG, Hap or CineForm on Non-Commercial | Records. |
+| The Non-Commercial resolution limit | 1280 x 1280, per the Licensing page; what TD does to a larger TOP wasn't measured, because the deck never asks for one. `licenses.isNonCommercial` and `licenses.isPro` tell the licence from Python. |
+| Syphon Spout Out TOP, Non-Commercial | Works: a Syphon Spout In TOP in the same TD received the 1280 x 720 sender. |
+| Syphon Spout Out TOP with Active on | Cooks itself every frame, so the chain feeding it cooks with nothing downstream. |
+| Movie File Out TOP with Record on | Cooks itself every frame too. Forcing an extra `cook(force=True)` from a frame-end Execute DAT wrote one frame too many per take. |
+| Reading a Movie File Out's Info CHOP | `total_frames_written`, `total_frames_dropped` (frames repeated to cover drops), audio sample counts, `resx`/`resy` (128 x 128 until it really cooks). |
+| `project.realTime = False` during a take | Frames render as fast as the machine allows, faster than real time for a light scene. Audio File In (sequential) and a transport that steps by `absTime.seconds` stay in step with the picture: 180 frames held exactly 132,300 samples at 44.1 kHz. Audio Device Out, cameras and microphones don't. |
+| Realtime on, while tools probe TD | A 2 s take repeated 5 frames. |
+| AAC in a Movie File Out | 96, 128 or 192 kb/s only; 256 fails the take ("AAC must have a bit rate of 96, 128, or 192 kb/s"). |
+| ProRes .mov with AAC sound | The sound track came out short (0.95 s in a 1 s take). 24-bit PCM is exact. |
+| `page.appendPar(name, par=...)` for an XY or RGB parameter | Needs the first component Par (`parGroup[0]`) and creates the whole tuplet; passing the ParGroup raises. |
+| Wires into a COMP tagged `tdxn_exclude` | Not in the host's `.tdxn`, because they belong to the excluded entry. Wires out of it are kept. Harmless in `export` mode, where the `.toe` is the source of truth. |
+| An annotation's widget after Envoy renames it on creation | A warning for an invalid `.../annotate/annotation` path until the widget's `back` op recooks. |
+
+Choices that followed:
+
+- **Recording settings are applied when a take starts.** The recorder writes the file name, codec, container, frame rate, bit rate and audio onto the Movie File Out then, instead of keeping per-frame expressions on it. It falls back to MPEG-4 when the licence refuses NVIDIA encoding, and reports Failed when the operator errors or writes no frames.
+- **Size follows the licence.** The deck computes the requested size, scales it to the 1280 limit on Non-Commercial with its shape kept, and says so in a readout. The same project settings then render the full size on a Pro machine.
+- **Runtime readouts stay out of git.** The deck ships `tdxn_exclude:Outputsize` and `tdxn_exclude:Recordstatus`, and the host tags its bound copies the same way.
