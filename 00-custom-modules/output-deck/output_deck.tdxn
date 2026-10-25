@@ -310,6 +310,51 @@ custom_pars:
     style: Pulse
     label: Save Module
     help: 'Save this deck as the shared module: a clean copy (no bindings to the host, default values) goes to the External .tox Path on the Common page, with readable text versions beside it when Embody is in the project. Every project that loads that .tox picks the change up the next time it opens.'
+  - name: Watermark
+    style: Toggle
+    startSection: true
+    default: true
+    help: Lays the Watermark Text over the picture, in everything that is shown, shared and recorded. Off leaves the picture untouched.
+  - name: Watermarktext
+    style: Str
+    label: Watermark Text
+    default: hyperadapted
+    help: The word written over the picture, in Roboto, which ships with TouchDesigner, so it looks the same on Windows and macOS.
+  - name: Watermarkopacity
+    style: Float
+    label: Watermark Opacity
+    default: 0.3
+    clampMin: true
+    clampMax: true
+    help: 'How strongly the watermark shows: 0 is invisible, 1 is solid.'
+  - name: Watermarkcolor
+    style: RGBA
+    label: Watermark Color
+    size: 3
+    default: 1
+    help: Colour of the watermark text.
+  - name: Watermarksize
+    style: Float
+    label: Watermark Size
+    default: 0.06
+    min: 0.01
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    normMin: 0.02
+    normMax: 0.2
+    help: 'Font size as a fraction of the picture height: 0.06 is 6%, so the text keeps its size relative to any Output Format.'
+  - name: Watermarkpos
+    style: XYZW
+    label: Watermark Position
+    size: 2
+    min: -0.5
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    normMin: -0.5
+    normMax: 0.5
+    help: 'Where the text sits, as an offset from the middle in fractions of the picture: 0, 0 is middle centre; 0.5 moves it to the right (or top) edge and -0.5 to the left (or bottom).'
 parameters:
   parentshortcut: OutputDeck
   reloadbuiltin: false
@@ -375,9 +420,9 @@ operators:
   - const_black
 - name: null_out
   type: nullTOP
-  position: [2800, 0]
+  position: [3200, 0]
   inputs:
-  - glsl_frame
+  - comp_watermark
 - name: recorder
   type: textDAT
   parameters:
@@ -392,7 +437,7 @@ operators:
     audiocodec: aac
     audiobitrate: b192
     fps: 60
-  position: [4000, -800]
+  position: [4400, -800]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
   inputs:
@@ -401,7 +446,7 @@ operators:
   type: outTOP
   parameters:
     label: =me.name
-  position: [3600, 0]
+  position: [4000, 0]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
   inputs:
@@ -411,7 +456,7 @@ operators:
   parameters:
     active: =parent.OutputDeck.par.Share
     sendername: =parent.OutputDeck.par.Sendername
-  position: [3600, -400]
+  position: [4000, -400]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
   inputs:
@@ -482,7 +527,7 @@ operators:
   parameters:
     op: movie_out
     autoexportroot: =parent()
-  position: [4400, -800]
+  position: [4800, -800]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
 - name: null_audio
@@ -501,7 +546,7 @@ operators:
     outputresolution: custom
     resolutionw: 1280
     resolutionh: 720
-  position: [3600, -800]
+  position: [4000, -800]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
   inputs:
@@ -526,6 +571,38 @@ operators:
     const:
     - name: silence
   position: [0, -1400]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: comp_watermark
+  type: compositeTOP
+  parameters:
+    operand: over
+  position: [2800, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - text_watermark
+  - glsl_frame
+- name: text_watermark
+  type: textTOP
+  parameters:
+    text: =parent.OutputDeck.par.Watermarktext
+    fontfile: =app.samplesFolder + '/Fonts/Roboto-Medium.ttf'
+    fontsizex: =parent.OutputDeck.par.Watermarksize * op('framing').module.RenderSize(parent.OutputDeck)[1]
+    fontsizexunit: pixels
+    positionx: =parent.OutputDeck.par.Watermarkposx
+    positiony: =parent.OutputDeck.par.Watermarkposy
+    positionunit: fraction
+    alignxmode: bbox
+    alignymode: bbox
+    fontcolorr: =parent.OutputDeck.par.Watermarkcolorr
+    fontcolorg: =parent.OutputDeck.par.Watermarkcolorg
+    fontcolorb: =parent.OutputDeck.par.Watermarkcolorb
+    fontalpha: =parent.OutputDeck.par.Watermarkopacity * parent.OutputDeck.par.Watermark
+    outputresolution: custom
+    resolutionw: =op('framing').module.RenderSize(parent.OutputDeck)[0]
+    resolutionh: =op('framing').module.RenderSize(parent.OutputDeck)[1]
+  position: [2400, -400]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
 - name: glsl_frame_info
@@ -565,16 +642,16 @@ annotations:
 - name: annotate1
   mode: annotate
   title: Picture In and Framing
-  text: 'The picture (in_video; black from const_black when nothing is wired) is placed on the output canvas by glsl_frame at the size the Format page asks for (framing: preset, swap, licence limit): fit, zoom and position, the soft edge where it meets the background, the background (solid colour; the picture blurred to cover the canvas through fit_bg -> blur_bg -> switch_bg; mirrored; or transparent) and the blend -> null_out.'
+  text: 'The picture (in_video; black from const_black when nothing is wired) is placed on the output canvas by glsl_frame at the size the Format page asks for (framing: preset, swap, licence limit): fit, zoom and position, the soft edge where it meets the background, the background (solid colour; the picture blurred to cover the canvas through fit_bg -> blur_bg -> switch_bg; mirrored; or transparent) and the blend; comp_watermark lays text_watermark (the Watermark page) over it -> null_out.'
   position: [-70, -470]
-  size: [3070, 730]
+  size: [3470, 730]
   color: [0.35, 0.25, 0.45]
   opacity: 0.6
 - name: annotate2
   mode: annotate
   title: Share and Record
   text: out_video is the framed picture, for the host. spout_out shares it as a Spout/Syphon sender while Share is on; it cooks itself, so nothing has to pull the deck. res_record scales the picture to the Record Size with High Quality Resize (pixels averaged, so scanlines and fine patterns don't sparkle); movie_out records the takes the recorder sets up, and also cooks itself while recording, so res_record cooks only then. info_movie counts written and repeated frames.
-  position: [3530, -870]
+  position: [3930, -870]
   size: [1070, 1130]
   color: [0.45, 0.3, 0.2]
   opacity: 0.6

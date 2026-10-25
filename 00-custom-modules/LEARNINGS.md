@@ -165,6 +165,7 @@ From adding GIF, Quality steps, Record Size and Frame Rate to `output-deck/`. Me
 | Keyframe Interval | TD's default is 15 frames. 60 at 60 fps made MPEG-4 8% smaller. |
 | Changing a menu parameter's `menuNames` | The value keeps its index, not its name: `high`, second of three, became `small`, second of five. Set the value again after changing a menu. |
 | A parameter created on an instance and then saved into the `.tox` | Kept its bind across the next reload (unlike one the `.tox` doesn't have; section 7). |
+| Fonts that ship with TouchDesigner | `Samples/Fonts` holds Roboto, Open Sans, Noto Sans CJK and PT Mono. A Text TOP whose Font File is `app.samplesFolder + '/Fonts/Roboto-Medium.ttf'` doesn't depend on system fonts (not checked on the macOS build). Position in Fraction units with centred alignment is an offset from the middle: 0.5 reaches the edge. |
 
 Choices that followed:
 

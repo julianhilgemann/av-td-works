@@ -455,6 +455,51 @@ custom_pars:
     - Lighten
     help: 'How the picture sits on the background: Over covers it, Add and Screen let the background show through the picture''s dark parts (for glowing visuals on black), Lighten keeps the brighter of the two.'
     value: lighten
+  - name: Watermark
+    style: Toggle
+    startSection: true
+    default: true
+    help: Lays the Watermark Text over the picture, in everything that is shown, shared and recorded. Off leaves the picture untouched.
+  - name: Watermarktext
+    style: Str
+    label: Watermark Text
+    default: hyperadapted
+    help: The word written over the picture, in Roboto, which ships with TouchDesigner, so it looks the same on Windows and macOS.
+  - name: Watermarkopacity
+    style: Float
+    label: Watermark Opacity
+    default: 0.3
+    clampMin: true
+    clampMax: true
+    help: 'How strongly the watermark shows: 0 is invisible, 1 is solid.'
+  - name: Watermarkcolor
+    style: RGBA
+    label: Watermark Color
+    size: 3
+    default: 1
+    help: Colour of the watermark text.
+  - name: Watermarksize
+    style: Float
+    label: Watermark Size
+    default: 0.06
+    min: 0.01
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    normMin: 0.02
+    normMax: 0.2
+    help: 'Font size as a fraction of the picture height: 0.06 is 6%, so the text keeps its size relative to any Output Format.'
+  - name: Watermarkpos
+    style: XYZW
+    label: Watermark Position
+    size: 2
+    min: -0.5
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    normMin: -0.5
+    normMax: 0.5
+    help: 'Where the text sits, as an offset from the middle in fractions of the picture: 0, 0 is middle centre; 0.5 moves it to the right (or top) edge and -0.5 to the left (or bottom).'
   - name: Share
     style: Toggle
     label: Send to OBS (Spout/Syphon)

@@ -14,6 +14,7 @@ Where a project's picture goes: framed to the size of the screen it's for, sent 
 
 - **Format.** Output Format: Same as Input, HD 720p, Full HD 1080p, 4K UHD TV, Phone 9:16 (1080 x 1920), iPhone Full Screen (1179 x 2556), Square, Portrait 4:5 or Custom Size (Custom Width and Height). Swap Width and Height turns any of them on its side. Output Size shows the size being sent.
 - **Framing.** Picture Fit (Fit Inside, Fill, Stretch, Native Size), Picture Zoom and Picture Position. Soft Edge fades the picture into the background where the two meet, along a Rectangle or an Oval. Background: Solid Colour, Blurred Picture, Mirrored Picture or Transparent, with Background Colour and Picture in Background. Blend: Over, Add, Screen or Lighten.
+- **Watermark.** Watermark (on by default), Watermark Text (`hyperadapted`), Watermark Opacity (0.3), Watermark Color (white), Watermark Size (a fraction of the picture height, 0.06) and Watermark Position (an offset from the middle: 0, 0 is middle centre and ±0.5 reaches the edges). It is in everything the deck shows, shares and records.
 - **Share.** Send to OBS (Spout/Syphon) and Sender Name.
 - **Record.** Record, Timing (Frame-Exact or Live), Stop After, Codec (H.264, H.265, MPEG-4, ProRes, GIF), Quality (Smallest File, Small, Standard, High, Very High), Record Size (Auto, Output Size, 1/2, 1/3, 1/4), Frame Rate (Auto, or 50 down to 10 fps), Record Audio, Recordings Folder (default `media/exports` in the project), Recording Name, Open Recordings Folder, and the Recording readout, which also gives each take's size and frame rate.
 - **Module.** Save Module.
@@ -36,6 +37,7 @@ Where a project's picture goes: framed to the size of the screen it's for, sent 
 ## How it works
 
 - `glsl_frame` frames the picture in one shader: fit, zoom, position, soft edge, background and blend. A side of the picture that reaches the border of the output stays sharp, so a picture that already fills the output passes through unchanged (within 1/255).
+- `text_watermark` writes the Watermark Text in Roboto Medium, which ships with TouchDesigner (`app.samplesFolder + '/Fonts/'`), so the watermark doesn't depend on the machine's fonts. `comp_watermark` lays it over the framed picture; with Watermark off its opacity is 0 and the picture passes through unchanged. The text redraws only when a Watermark setting or the output size changes.
 - Blurred Picture is the picture fitted to cover the output at 1/8 size and blurred (`fit_bg` → `blur_bg`). `switch_bg` cooks that only while it's the chosen background.
 - The output is 8-bit, so values brighter than white in a float picture are clipped, as Spout and the encoders would clip them anyway.
 - **Frame-Exact** turns TD's Realtime flag off for the take and back to what it was afterwards. Every frame is rendered, as fast as the machine can: a light scene records faster than real time, a heavy one slower. The movie's picture and sound stay in step (a 3 s take had 180 frames and 132,300 samples at 44.1 kHz), but the speakers, a camera and a microphone don't, so use Live for live input. A Live take repeats each frame TD drops, and the Recording readout counts them.
