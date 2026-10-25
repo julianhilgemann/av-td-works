@@ -19,7 +19,7 @@ Audiovisual TouchDesigner works. Each folder is a standalone project: open the `
 
 ## Shared modules
 
-`00-custom-modules/` holds components that projects load as External .tox: `source_deck` (camera, file and YouTube sources with a transport), `audio_analyzer`, `midi_analyzer`, `modulator`, `av_rig`, which combines those three, `output_deck` (framing for a phone, a TV or any size, Spout/Syphon to OBS, and movie recording) and `crt_filter` (a CRT tube and analog-signal look for any TOP). Projects find them at `../00-custom-modules/`, so keep the folder beside them. Its README covers using and changing modules.
+`00-custom-modules/` holds components that projects load as External .tox: `source_deck` (camera, file and YouTube sources with a transport), `audio_analyzer`, `midi_analyzer`, `modulator`, `av_rig`, which combines those three, `output_deck` (framing for a phone, a TV or any size, Spout/Syphon to OBS, and movie and GIF recording) and `crt_filter` (a CRT tube and analog-signal look for any TOP). Projects find them at `../00-custom-modules/`, so keep the folder beside them. Its README covers using and changing modules.
 
 ## Embody
 

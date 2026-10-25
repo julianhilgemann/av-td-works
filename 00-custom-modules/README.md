@@ -11,7 +11,7 @@ To turn a feature of a project into a new module, start with `LEARNINGS.md`: the
 | `midi-analyzer/` | MIDI in as named channels (the Octatrack's CC map by default: every knob, track, MIDI track, crossfader, scene and pattern), Learn, and a clock locked to MIDI clock and transport. | `av_rig` |
 | `modulator/` | An LFO bank and a routing matrix: any named source to any destination through a routes table. | `av_rig` |
 | `av-rig/` | The three above wired together, as one drop-in: audio, MIDI, clock and LFOs routed to the project's destinations. Each project keeps its mapping in its own `<rig>_mapping` COMP. | `octatrack-av-setup` |
-| `output-deck/` | Where the picture goes: framed to a screen's size (phone, 4K TV, square, custom) with a soft edge into the background, sent to OBS over Spout or Syphon, and recorded to a movie with its sound. | `ferroscope` |
+| `output-deck/` | Where the picture goes: framed to a screen's size (phone, 4K TV, square, custom) with a soft edge into the background, sent to OBS over Spout or Syphon, and recorded to a movie with its sound or to a GIF, with quality, size and frame rate settings for small files. | `ferroscope` |
 | `crt-filter/` | A CRT look for any picture: analog signal faults (jitter, tracking noise, smear, ghosting, grain) and a curved tube with scanlines, a phosphor mask, halation and afterglow, with six preset looks. TOP in, TOP out. | `ferroscope` |
 
 ## Using a module in a project

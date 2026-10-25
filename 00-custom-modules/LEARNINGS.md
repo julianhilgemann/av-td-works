@@ -147,3 +147,27 @@ Choices that followed:
 - **The parent shortcut stays `CRT`**, so none of the expressions inside changed. The COMP is renamed `crt_filter`, like the other module instances.
 - **The Apply Preset callback became the module's one dispatcher**, `module_callbacks`, with Save Module beside it.
 - **ferroscope keeps its CRT look on the instance**, not on a host page. Binding all 59 parameters to a ferroscope page would put the look back in the host's `.tdxn`, at the cost of a new panel page and about 500 lines (the size of the parameter block `CRT.tdxn` had).
+
+## 10. Recording size and GIF
+
+From adding GIF, Quality steps, Record Size and Frame Rate to `output-deck/`. Measured on TouchDesigner 2025.32820, Non-Commercial, with 2-second takes of ferroscope's grainy 1280 x 720 picture at 60 fps, checked out of process:
+
+| What | What happens |
+|---|---|
+| TD's `bin` folder | Holds `ffmpeg.exe` and `ffprobe.exe`. They check a take without disturbing TD: frame count and duration (`ffprobe -count_frames`), repeated frames (`ffmpeg -f framemd5`), quality against a reference (`ssim` and `psnr` filters). |
+| Which Movie File Out parameters a codec uses | TD disables the rest: read `par.enable` with the codec selected. MPEG-4 uses Quality Scale and Keyframe Interval, not Average or Peak Bitrate; GIF uses Quality Scale and Movie FPS; H.264 uses the bit rates. |
+| MPEG-4's bit rate | Ignored: a take set to 11 Mb/s wrote 54 Mb/s, because Quality Scale was at its default of 1. Quality Scale 0.8, 0.6, 0.45, 0.3, 0.15 and 0 wrote 19.5, 11.6, 8.8, 5.5, 4.4 and 3.4 Mb/s. |
+| Quality Scale on a GIF | No effect: 1, 0.5 and 0.1 wrote byte-identical files. |
+| ProRes | `videocodectype` picks the profile (`prores422proxy`, `prores422lt`, `prores422`, `prores422hq`, `prores4444`, `prores4444xq`). Proxy wrote a fifth of HQ. |
+| Movie FPS below the cook rate | Frames are dropped by time: 30 fps from a 60 fps cook wrote 60 frames in 2 s, with AAC sound of 1.997 s, and `total_frames_dropped` stayed 0. Stop-Frame Movie with Add Frame wrote the same frames. |
+| A GIF | Codec `gif`, a `.gif` file name, no container parameter; records on Non-Commercial. Delays are in 1/100 s: 60 fps wrote alternating delays of 1 and 2, and browsers play a delay of 1 as 10. 20 fps wrote 5 throughout. TD uses a fixed palette. |
+| The Movie File Out's own Output Resolution | Sets the recorded size, but ignores Input Smoothness (linear and mipmap wrote identical files) and aliases fine patterns: SSIM 0.915 against an area-averaged reference at 1/4 size. A Resolution TOP with High Quality Resize in front of it scored 0.999. |
+| Keyframe Interval | TD's default is 15 frames. 60 at 60 fps made MPEG-4 8% smaller. |
+| Changing a menu parameter's `menuNames` | The value keeps its index, not its name: `high`, second of three, became `small`, second of five. Set the value again after changing a menu. |
+| A parameter created on an instance and then saved into the `.tox` | Kept its bind across the next reload (unlike one the `.tox` doesn't have; section 7). |
+
+Choices that followed:
+
+- **One Quality menu sets whatever each codec responds to**: bits per pixel for H.264 and H.265, Quality Scale for MPEG-4, a profile for ProRes. The H.264 and H.265 steps are untested here, for want of a Commercial licence.
+- **Record Size and Frame Rate have an Auto** that is right for both: the output size and project rate for video, 480 pixels and 20 fps for a GIF, so choosing GIF alone gives a file that plays correctly and stays small.
+- **`res_record` does the scaling**, and the recorder keeps setting everything when a take starts, so `movie_out` ships with its old values.

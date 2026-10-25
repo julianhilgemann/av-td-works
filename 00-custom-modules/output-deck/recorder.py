@@ -11,7 +11,19 @@ import datetime
 import os
 import re
 
-_BITS_PER_PIXEL = {'standard': 0.1, 'high': 0.2, 'max': 0.35}
+# What each Quality step sets, per codec. H.264 and H.265 take a bit rate (bits per pixel, scaled
+# to the record size and frame rate); MPEG-4 ignores bit rates, so it takes TD's Quality Scale
+# (measured on a grainy 1280 x 720 picture at 60 fps: about 4, 5.5, 9, 12 and 20 Mb/s); ProRes
+# takes a profile. GIF has no quality setting: its size follows Record Size and Frame Rate.
+_BITS_PER_PIXEL = {'smallest': 0.03, 'small': 0.05, 'standard': 0.1, 'high': 0.2, 'max': 0.35}
+_QUALITY_SCALE = {'smallest': 0.15, 'small': 0.3, 'standard': 0.45, 'high': 0.6, 'max': 0.8}
+_PRORES = {'smallest': 'prores422proxy', 'small': 'prores422lt', 'standard': 'prores422',
+	'high': 'prores422hq', 'max': 'prores4444'}
+_EXTENSIONS = {'prores': '.mov', 'gif': '.gif'}  # every other codec writes .mp4
+_SCALES = {'half': 1 / 2.0, 'third': 1 / 3.0, 'quarter': 1 / 4.0}
+_GIF_SIDE = 480  # longest side of a GIF on Auto Record Size
+_GIF_RATE = 20  # frame rate of a GIF on Auto
+_GIF_MAX_RATE = 50  # GIF delays are in 1/100 s, and browsers play a 1/100 s delay as 1/10 s
 _NVIDIA_CODECS = ('h264', 'h265')  # GPU encoders, which need a Commercial or Pro licence
 _STATUS_EVERY = 15  # frames between Recording readout updates
 
@@ -50,37 +62,73 @@ def Reset(comp):
 	_write(comp.par.Outputsize, comp.op('framing').module.Describe(comp))
 
 def _start(comp, movie):
-	"""Set up movie_out for the take (file, codec, bit rate, audio), leave Realtime for
-	Frame-Exact and start recording."""
+	"""Set up res_record and movie_out for the take (file, codec, size, frame rate, quality,
+	audio), leave Realtime for Frame-Exact and start recording."""
 	codec = comp.par.Recordcodec.eval()
 	note = ''
 	if codec in _NVIDIA_CODECS and licenses.isNonCommercial:
 		codec = 'mpeg4'
 		note = ' (H.264 and H.265 need a Commercial licence, so this take is MPEG-4)'
+	gif = codec == 'gif'
 	folder = comp.par.Recordfolder.eval() or 'media/exports'
 	os.makedirs(_absolute(folder), exist_ok=True)
 	name = comp.par.Recordname.eval().strip() or project.name.split('.')[0]
 	stamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-	extension = '.mov' if codec == 'prores' else '.mp4'
+	extension = _EXTENSIONS.get(codec, '.mp4')
 	movie.par.file = os.path.join(folder, name + '_' + stamp + extension).replace('\\', '/')
 	movie.par.videocodec = codec
-	movie.par.moviecontainer = extension[1:]
+	if not gif:
+		movie.par.moviecontainer = extension[1:]  # a GIF has no container setting
 	movie.par.audiocodec = 'pcm24' if codec == 'prores' else 'aac'  # editing files keep lossless sound
-	movie.par.fps = project.cookRate
-	w, h = comp.op('framing').module.RenderSize(comp)
-	bitrate = w * h * project.cookRate * _BITS_PER_PIXEL[comp.par.Recordquality.eval()] / 1000.0
+	w, h = _recordSize(comp, gif)
+	rate = _recordRate(comp, gif)
+	resize = comp.op('res_record')
+	resize.par.resolutionw = w
+	resize.par.resolutionh = h
+	movie.par.fps = rate
+	movie.par.keyframeinterval = max(1, int(round(rate)))  # one a second: smaller than TD's 15 frames
+	quality = comp.par.Recordquality.eval()
+	bitrate = w * h * rate * _BITS_PER_PIXEL[quality] / 1000.0
 	movie.par.avgbitrate = bitrate
 	movie.par.peakbitrate = bitrate * 1.5
+	movie.par.qualityscale = _QUALITY_SCALE[quality]
+	if codec == 'prores':
+		movie.par.videocodectype = _PRORES[quality]
 	# Sound only from a wired audio input: the silence behind an unwired one is not an audio stream.
-	wired = comp.par.Recordaudio.eval() and comp.inputConnectors[1].connections
+	wired = not gif and comp.par.Recordaudio.eval() and comp.inputConnectors[1].connections
 	movie.par.audiochop = 'null_audio' if wired else ''
 	if comp.par.Recordtiming.eval() == 'exact':
 		comp.store('realtimeBefore', project.realTime)
 		project.realTime = False
+	note = ' at %d x %d, %g fps%s' % (w, h, rate, note)
 	comp.store('startFrame', absTime.frame)
 	comp.store('takeNote', note)
 	movie.par.record = 1
 	_write(comp.par.Recordstatus, 'Recording to ' + movie.par.file.eval() + note)
+
+def _recordSize(comp, gif):
+	"""Record Size: the output size, scaled down by the chosen fraction, or on Auto for a GIF
+	to its longest side; shape kept, both sides even (H.264 and H.265 need even sizes)."""
+	w, h = comp.op('framing').module.RenderSize(comp)
+	choice = comp.par.Recordsize.eval()
+	if choice in _SCALES:
+		scale = _SCALES[choice]
+	elif choice == 'auto' and gif:
+		scale = min(1.0, _GIF_SIDE / max(w, h))
+	else:
+		scale = 1.0
+	return _even(w * scale), _even(h * scale)
+
+def _recordRate(comp, gif):
+	"""Frame Rate: the chosen rate, or on Auto the project's (a GIF's own on Auto); never above
+	the project's rate, and a GIF never above the fastest rate browsers play."""
+	choice = comp.par.Recordrate.eval()
+	if choice == 'auto':
+		rate = _GIF_RATE if gif else project.cookRate
+	else:
+		rate = float(choice[3:])  # 'fps30' -> 30
+	rate = min(rate, project.cookRate)
+	return min(rate, _GIF_MAX_RATE) if gif else rate
 
 def _stop(comp, movie, failure=''):
 	"""Close the movie, restore Realtime and report the file, or why nothing was saved."""
@@ -117,6 +165,9 @@ def _absolute(folder):
 def _clock(seconds):
 	minutes, seconds = divmod(int(seconds), 60)
 	return '%d:%02d' % (minutes, seconds)
+
+def _even(x):
+	return max(2, int(round(x / 2.0)) * 2)
 
 def _write(par, value):
 	"""Set a readout only when it changes, so a bound host parameter is not touched every frame."""

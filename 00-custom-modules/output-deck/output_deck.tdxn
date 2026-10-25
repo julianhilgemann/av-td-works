@@ -213,30 +213,78 @@ custom_pars:
     - h265
     - mpeg4
     - prores
+    - gif
     menuLabels:
     - H.264 (.mp4)
     - H.265 / HEVC (.mp4)
     - MPEG-4 (.mp4)
     - Apple ProRes (.mov)
-    help: H.264 plays everywhere and H.265 makes smaller files; both encode on an NVIDIA GPU and need a Commercial or Pro licence, so on a Non-Commercial licence they record as MPEG-4 instead. MPEG-4 writes a larger .mp4 on any licence; Apple ProRes writes a large .mov for editing.
+    - GIF (.gif, no sound)
+    help: H.264 plays everywhere and H.265 makes smaller files; both encode on an NVIDIA GPU and need a Commercial or Pro licence, so on a Non-Commercial licence they record as MPEG-4 instead. MPEG-4 writes .mp4 on any licence; Apple ProRes writes a large .mov for editing. GIF writes an animated .gif without sound, in TD's fixed colour palette; on Auto it is 480 pixels on its longest side at 20 fps.
   - name: Recordquality
     style: Menu
     label: Quality
-    default: high
+    default: standard
     menuNames:
+    - smallest
+    - small
     - standard
     - high
     - max
     menuLabels:
+    - Smallest File
+    - Small
     - Standard
     - High
     - Very High
-    help: 'Video bit rate for H.264, H.265 and MPEG-4, scaled to the output size and frame rate: about 0.1, 0.2 and 0.35 bits per pixel. High is about 25 Mb/s at 1080 x 1920 and 60 fps.'
+    help: 'How hard the movie is compressed: smaller files or better pictures. H.264 and H.265 get a bit rate of about 0.03, 0.05, 0.1, 0.2 or 0.35 bits per pixel at the record size and frame rate. MPEG-4 ignores bit rates and gets TD''s Quality Scale 0.15, 0.3, 0.45, 0.6 or 0.8 instead: about 4, 5.5, 9, 12 or 20 Mb/s at 1280 x 720 and 60 fps, depending on the picture. ProRes steps from 422 Proxy through LT, 422 and 422 HQ to 4444. GIF has no quality steps: Record Size and Frame Rate set its file size.'
+  - name: Recordsize
+    style: Menu
+    label: Record Size
+    default: auto
+    menuNames:
+    - auto
+    - full
+    - half
+    - third
+    - quarter
+    menuLabels:
+    - Auto (Output Size; GIF 480 px)
+    - Output Size
+    - 1/2 Size
+    - 1/3 Size
+    - 1/4 Size
+    help: 'Size of the recorded movie. Auto records at the Output Size, and a GIF at most 480 pixels on its longest side. The fractions scale the Output Size down with its shape kept: half the width and height makes about a fifth of the file. Pixels are averaged when scaling, so scanlines and fine patterns do not sparkle.'
+  - name: Recordrate
+    style: Menu
+    label: Frame Rate
+    default: auto
+    menuNames:
+    - auto
+    - fps50
+    - fps30
+    - fps25
+    - fps24
+    - fps20
+    - fps15
+    - fps12
+    - fps10
+    menuLabels:
+    - Auto (Project Rate; GIF 20 fps)
+    - 50 fps
+    - 30 fps
+    - 25 fps
+    - 24 fps
+    - 20 fps
+    - 15 fps
+    - 12 fps
+    - 10 fps
+    help: 'Frames per second of the recorded movie. Auto uses the project''s rate, and 20 for a GIF. A lower rate records fewer frames of the same time, with the sound in step: 30 instead of 60 fps made the file about 40% smaller. Never above the project''s rate, and a GIF never above 50, the fastest browsers play.'
   - name: Recordaudio
     style: Toggle
     label: Record Audio
     default: true
-    help: Adds the audio input to the movie (AAC). Off records the picture only.
+    help: Adds the audio input to the movie (AAC; 24-bit uncompressed with ProRes). Off records the picture only. GIFs have no sound.
   - name: Recordfolder
     style: Folder
     label: Recordings Folder
@@ -264,7 +312,9 @@ custom_pars:
     help: 'Save this deck as the shared module: a clean copy (no bindings to the host, default values) goes to the External .tox Path on the Common page, with readable text versions beside it when Embody is in the project. Every project that loads that .tox picks the change up the next time it opens.'
 parameters:
   parentshortcut: OutputDeck
+  reloadbuiltin: false
 flags:
+- viewer
 - -allowCooking
 color: [0.2, 0.4, 0.3]
 tags:
@@ -342,11 +392,11 @@ operators:
     audiocodec: aac
     audiobitrate: b192
     fps: 60
-  position: [3600, -800]
+  position: [4000, -800]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
   inputs:
-  - null_out
+  - res_record
 - name: out_video
   type: outTOP
   parameters:
@@ -432,7 +482,7 @@ operators:
   parameters:
     op: movie_out
     autoexportroot: =parent()
-  position: [4000, -800]
+  position: [4400, -800]
   size: [130, 90]
   color: [0.67, 0.67, 0.67]
 - name: null_audio
@@ -444,6 +494,18 @@ operators:
   color: [0.67, 0.67, 0.67]
   inputs:
   - in_audio
+- name: res_record
+  type: resolutionTOP
+  parameters:
+    highqualresize: true
+    outputresolution: custom
+    resolutionw: 1280
+    resolutionh: 720
+  position: [3600, -800]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_out
 - name: const_black
   type: constantTOP
   parameters:
@@ -511,9 +573,9 @@ annotations:
 - name: annotate2
   mode: annotate
   title: Share and Record
-  text: out_video is the framed picture, for the host. spout_out shares it as a Spout/Syphon sender while Share is on; it cooks itself, so nothing has to pull the deck. movie_out records the takes the recorder sets up, and also cooks itself while recording; info_movie counts written and repeated frames.
+  text: out_video is the framed picture, for the host. spout_out shares it as a Spout/Syphon sender while Share is on; it cooks itself, so nothing has to pull the deck. res_record scales the picture to the Record Size with High Quality Resize (pixels averaged, so scanlines and fine patterns don't sparkle); movie_out records the takes the recorder sets up, and also cooks itself while recording, so res_record cooks only then. info_movie counts written and repeated frames.
   position: [3530, -870]
-  size: [670, 1130]
+  size: [1070, 1130]
   color: [0.45, 0.3, 0.2]
   opacity: 0.6
 - name: annotate3

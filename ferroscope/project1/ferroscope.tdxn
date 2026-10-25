@@ -1,6 +1,6 @@
 format: tdxn
 version: '2.2'
-build: 4
+build: 5
 generator: Embody/6.2.72
 td_build: 099.2025.32820
 network_path: /project1/ferroscope
@@ -495,31 +495,80 @@ custom_pars:
     - h265
     - mpeg4
     - prores
+    - gif
     menuLabels:
     - H.264 (.mp4)
     - H.265 / HEVC (.mp4)
     - MPEG-4 (.mp4)
     - Apple ProRes (.mov)
-    help: H.264 plays everywhere and H.265 makes smaller files; both encode on an NVIDIA GPU and need a Commercial or Pro licence, so on a Non-Commercial licence they record as MPEG-4 instead. MPEG-4 writes a larger .mp4 on any licence; Apple ProRes writes a large .mov for editing.
+    - GIF (.gif, no sound)
+    help: H.264 plays everywhere and H.265 makes smaller files; both encode on an NVIDIA GPU and need a Commercial or Pro licence, so on a Non-Commercial licence they record as MPEG-4 instead. MPEG-4 writes .mp4 on any licence; Apple ProRes writes a large .mov for editing. GIF writes an animated .gif without sound, in TD's fixed colour palette; on Auto it is 480 pixels on its longest side at 20 fps.
     value: mpeg4
   - name: Recordquality
     style: Menu
     label: Quality
-    default: high
+    default: standard
     menuNames:
+    - smallest
+    - small
     - standard
     - high
     - max
     menuLabels:
+    - Smallest File
+    - Small
     - Standard
     - High
     - Very High
-    help: 'Video bit rate for H.264, H.265 and MPEG-4, scaled to the output size and frame rate: about 0.1, 0.2 and 0.35 bits per pixel. High is about 25 Mb/s at 1080 x 1920 and 60 fps.'
+    help: 'How hard the movie is compressed: smaller files or better pictures. H.264 and H.265 get a bit rate of about 0.03, 0.05, 0.1, 0.2 or 0.35 bits per pixel at the record size and frame rate. MPEG-4 ignores bit rates and gets TD''s Quality Scale 0.15, 0.3, 0.45, 0.6 or 0.8 instead: about 4, 5.5, 9, 12 or 20 Mb/s at 1280 x 720 and 60 fps, depending on the picture. ProRes steps from 422 Proxy through LT, 422 and 422 HQ to 4444. GIF has no quality steps: Record Size and Frame Rate set its file size.'
+    value: high
+  - name: Recordsize
+    style: Menu
+    label: Record Size
+    default: auto
+    menuNames:
+    - auto
+    - full
+    - half
+    - third
+    - quarter
+    menuLabels:
+    - Auto (Output Size; GIF 480 px)
+    - Output Size
+    - 1/2 Size
+    - 1/3 Size
+    - 1/4 Size
+    help: 'Size of the recorded movie. Auto records at the Output Size, and a GIF at most 480 pixels on its longest side. The fractions scale the Output Size down with its shape kept: half the width and height makes about a fifth of the file. Pixels are averaged when scaling, so scanlines and fine patterns do not sparkle.'
+  - name: Recordrate
+    style: Menu
+    label: Frame Rate
+    default: auto
+    menuNames:
+    - auto
+    - fps50
+    - fps30
+    - fps25
+    - fps24
+    - fps20
+    - fps15
+    - fps12
+    - fps10
+    menuLabels:
+    - Auto (Project Rate; GIF 20 fps)
+    - 50 fps
+    - 30 fps
+    - 25 fps
+    - 24 fps
+    - 20 fps
+    - 15 fps
+    - 12 fps
+    - 10 fps
+    help: 'Frames per second of the recorded movie. Auto uses the project''s rate, and 20 for a GIF. A lower rate records fewer frames of the same time, with the sound in step: 30 instead of 60 fps made the file about 40% smaller. Never above the project''s rate, and a GIF never above 50, the fastest browsers play.'
   - name: Recordaudio
     style: Toggle
     label: Record Audio
     default: true
-    help: Adds the audio input to the movie (AAC). Off records the picture only.
+    help: Adds the audio input to the movie (AAC; 24-bit uncompressed with ProRes). Off records the picture only. GIFs have no sound.
   - name: Recordfolder
     style: Folder
     label: Recordings Folder
@@ -854,14 +903,14 @@ custom_pars:
     normMin: 12.0
     normMax: 100.0
     help: Number of spikes across the width of the image.
-    value: 22.1000003815
+    value: 56.5
   - name: Gridrotate
     style: Float
     label: Grid Rotation
     min: -180.0
     max: 180.0
     help: Rotation of the spike lattice, in degrees.
-    value: 0.0909999982
+    value: 0.2469999939
   - name: Cellrandom
     style: Float
     label: Cell Randomness
@@ -876,7 +925,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: 0 = a continuous liquid relief of the sonogram, 1 = separate spikes on a thin pool.
-    value: 0.253
+    value: 0.1930000037
   - name: Structure
     style: Menu
     startSection: true
@@ -926,7 +975,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Spike base width relative to the grid spacing. Above about 0.9 neighbouring spikes merge.
-    value: 0.2
+    value: 0.27700001
   - name: Sharpness
     style: Float
     label: Spike Sharpness
@@ -966,7 +1015,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Height of a finer lattice of small spikes nested between the large ones.
-    value: 0.982
+    value: 0.6510000229
   - name: Subgridscale
     style: Float
     label: Sub-Grid Density
@@ -1000,6 +1049,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Rings rippling across the pool from the kaleidoscope centre, stronger when loud.
+    value: 0.4699999988
   - name: Ripplefreq
     style: Float
     label: Ripple Density
@@ -1011,7 +1061,7 @@ custom_pars:
     normMin: 2.0
     normMax: 20.0
     help: Number of ripple rings per unit of distance.
-    value: 2.1
+    value: 4
   Warp:
   - name: Warptype
     style: Menu
@@ -1038,7 +1088,7 @@ custom_pars:
     clampMax: true
     normMax: 2.0
     help: How far the liquid surface and spike positions sway.
-    value: 0.2399999946
+    value: 0.1800000072
   - name: Warpscale
     style: Float
     label: Warp Scale
@@ -1081,7 +1131,7 @@ custom_pars:
     clampMax: true
     normMax: 5.0
     help: How much overall loudness speeds up the liquid sway.
-    value: 3.92
+    value: 1.6599999666
   - name: Swirl
     style: Float
     startSection: true
@@ -1100,7 +1150,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: How far the vortex reaches from the centre.
-    value: 0.169
+    value: 0.3799999952
   Kaleido:
   - name: Kaleidomode
     style: Menu
@@ -1136,7 +1186,7 @@ custom_pars:
     normMin: 1.0
     normMax: 12.0
     help: Number of mirrored wedge pairs around the centre. 6 matches the hexagonal grid.
-    value: 9
+    value: 2
   - name: Zoom
     style: Float
     default: 0.7
@@ -1147,7 +1197,7 @@ custom_pars:
     normMin: 0.2
     normMax: 2.0
     help: Size of the sonogram inside the kaleidoscope. In Radial mode this is the radius where the newest sound appears.
-    value: 0.2
+    value: 0.2700000107
   - name: Zoompulse
     style: Float
     label: Zoom Pulse
@@ -1171,7 +1221,7 @@ custom_pars:
     normMin: -20.0
     normMax: 20.0
     help: Rotation speed of the kaleidoscope, in degrees per second.
-    value: 3.5999999046
+    value: -20
   - name: Spinreact
     style: Float
     label: Spin Reactivity
@@ -1188,7 +1238,7 @@ custom_pars:
     clampMax: true
     normMax: 60.0
     help: Back-and-forth rotation amplitude, in degrees.
-    value: 18.8
+    value: 13.6999998093
   - name: Swayspeed
     style: Float
     label: Sway Speed (Hz)
@@ -1206,7 +1256,7 @@ custom_pars:
     normMin: -3.0
     normMax: 3.0
     help: 'Spiral twist: extra rotation in radians per unit of distance from the centre.'
-    value: -0.36
+    value: 0.1800000072
   - name: Pinch
     style: Float
     label: Radial Pinch
@@ -1225,7 +1275,7 @@ custom_pars:
     clampMax: true
     normMax: 12.0
     help: Split the kaleidoscope into concentric rings that rotate against each other. 0 = off.
-    value: 6.2899999619
+    value: 5.3499999046
   - name: Ringspin
     style: Float
     label: Ring Spin (deg/s)
@@ -1247,7 +1297,7 @@ custom_pars:
     clampMax: true
     normMin: 0.1
     help: Size of one tile in the Triangle, Square and Hex Cells modes.
-    value: 0.1
+    value: 0.7829999924
   - name: Tileoffset
     style: Float
     label: Tile Time Offset
@@ -1283,7 +1333,7 @@ custom_pars:
     min: -180.0
     max: 180.0
     help: 'Fractal mode: rotation at each fold, in degrees.'
-    value: 0.892
+    value: 0.7409999967
   - name: Foldoffset
     style: Float
     label: Fold Offset
@@ -1291,7 +1341,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: 'Fractal mode: shift at each fold; changes the motif.'
-    value: 0.506
+    value: 0.2169999927
   Viewer:
   - name: Videoactive
     style: Toggle
@@ -1303,6 +1353,7 @@ custom_pars:
     label: Mirror Camera
     default: true
     help: Mirror the camera so moving your right hand pulls the right side of the image.
+    value: false
   - name: Pull
     style: Float
     startSection: true
@@ -1312,7 +1363,7 @@ custom_pars:
     clampMax: true
     normMax: 3.0
     help: 'How strongly the viewer pulls the fluid: spikes rise and lean toward where you are.'
-    value: 1.8799999952
+    value: 0
   - name: Lens
     style: Float
     default: 1
@@ -1321,14 +1372,14 @@ custom_pars:
     clampMax: true
     normMax: 2.0
     help: How much the fluid bulges and magnifies toward the viewer, as if coming out of the screen.
-    value: 0.8399999738
+    value: 1.4700000286
   - name: Follow
     style: Float
     default: 0.6
     clampMin: true
     clampMax: true
     help: How far the kaleidoscope centre moves toward the viewer, so the fluid streams toward you.
-    value: 0.627
+    value: 0.1330000013
   - name: Proximityzoom
     style: Float
     label: Proximity Zoom
@@ -1338,7 +1389,7 @@ custom_pars:
     clampMax: true
     normMax: 2.0
     help: How much the fluid grows toward you as you come closer to the camera.
-    value: 0.69
+    value: 0.0399999991
   - name: Proximityrange
     style: Float
     label: Proximity Range
@@ -1347,7 +1398,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Share of the camera image you must fill to count as fully close. Lower values reach full proximity from further away.
-    value: 0.1389999986
+    value: 0.6330000162
   - name: Sensitivity
     style: Float
     startSection: true
@@ -1355,7 +1406,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: How different from the empty room a pixel must be to count as you. Raise it in a dim room or with a plain background.
-    value: 0.428
+    value: 0.7110000253
   - name: Presenceweight
     style: Float
     label: Presence Weight
@@ -1364,7 +1415,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: Strength of your body (difference from the learned empty room) in the pull field.
-    value: 0.711
+    value: 0.8130000234
   - name: Motionweight
     style: Float
     label: Motion Weight
@@ -1401,7 +1452,7 @@ custom_pars:
     clampMin: true
     clampMax: true
     help: How much the camera picture sets the spike heights. At 1 the spikes draw the picture like a halftone.
-    value: 0.4620000124
+    value: 0.27700001
   - name: Imgsource
     style: Menu
     label: Image Source
@@ -1438,7 +1489,7 @@ custom_pars:
     clampMax: true
     normMax: 3.0
     help: Contrast of the picture before it shapes the fluid.
-    value: 3
+    value: 0.8899999857
   - name: Imginvert
     style: Toggle
     label: Invert Image
