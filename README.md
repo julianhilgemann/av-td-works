@@ -8,6 +8,7 @@ Audiovisual TouchDesigner works. Each folder is a standalone project: open the `
 | [`touch-the-sonogram/`](touch-the-sonogram/README.md) | An installation: the same wavetable drone, shaped by a camera and a microphone and drawn as a point-cloud sonogram. |
 | [`caleidoscopic-sonogram-video/`](caleidoscopic-sonogram-video/README.md) | A square music video: the sonogram point cloud driven by an audio track and a modulator video. |
 | [`ferroscope/`](ferroscope/README.md) | Sound as ferrofluid: a spike lattice raised by a kaleidoscope-folded sonogram, leaning toward the viewer on camera, through the shared CRT filter. Its Output page frames, shares and records the picture. |
+| [`async-spectral/`](async-spectral/README.md) | A vertical Short cut out of sync with itself: a sweeping line holds the picture as streaks, and the streaks play as an additive synth through echo and reverb. |
 | [`audioreactive-pointcloud/`](audioreactive-pointcloud/README.md) | An audio-reactive point cloud. |
 | [`color-ribbon-butterfly/`](color-ribbon-butterfly/README.md) | 250,000 instanced hexagons placed by animated 4D simplex noise, smeared into colored ribbons by feedback, RGBA delay and a radial blur. |
 | [`infinite-hypercube/`](infinite-hypercube/README.md) | 262,144 points carried by a self-displacing noise field inside a cube whose faces wrap around, with trails, depth blur and RGBA delay. |
