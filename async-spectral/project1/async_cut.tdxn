@@ -1,0 +1,275 @@
+format: tdxn
+version: '2.2'
+build: 1
+generator: Embody/6.2.77
+td_build: 099.2025.32820
+network_path: /project1/async_cut
+options:
+  include_dat_content: false
+  include_storage: true
+type: baseCOMP
+custom_pars:
+  Cut:
+  - name: Mode
+    style: Menu
+    label: Cut Motion
+    default: auto
+    menuNames:
+    - auto
+    - timeline
+    - manual
+    menuLabels:
+    - Automatic (steady)
+    - Follow Video Time
+    - Manual
+    help: Automatic moves the cut at a constant speed across Sweep Duration; Follow Video Time ties it to the video position; Manual uses Progress.
+    value: timeline
+  - name: Duration
+    style: Float
+    label: Sweep Duration (s)
+    default: 120
+    min: 0.001
+    clampMin: true
+    normMax: 600.0
+    help: Seconds the cut takes to cross the picture (with Go Back, to cross and return). Defaults to the source video's length.
+    value: =max(op('source_deck/moviefilein_yt' if op('source_deck').par.Videosource == 'youtube' else 'source_deck/moviefilein').numSeconds, 0.001) if op('source_deck') else 120
+  - name: Run
+    style: Toggle
+    default: true
+    help: 'Automatic: moves the cut while on, holds it while off.'
+  - name: Atend
+    style: Menu
+    label: At End
+    default: clamp
+    menuNames:
+    - clamp
+    - loop
+    - zigzag
+    menuLabels:
+    - Hold
+    - Start Over
+    - Go Back
+    help: 'What the cut does at the far side. Automatic: hold, start over or come back. Follow Video Time: Go Back sweeps down in the first half of Sweep Duration and back up in the second; the other choices sweep once.'
+    value: zigzag
+  - name: Restart
+    style: Pulse
+    label: Restart Sweep
+    help: 'Automatic: sends the cut back to the start.'
+  - name: Time
+    style: Float
+    label: Video Time
+    help: Seconds into the video; defaults to the source_deck position.
+    value: =op('source_deck').par.Videotime.eval() if op('source_deck') else absTime.seconds
+  - name: Start
+    style: Float
+    label: Start (s)
+    default: 4
+    normMax: 60.0
+    help: 'Follow Video Time: video time when the cut enters.'
+    value: 0
+  - name: Ease
+    style: Toggle
+    label: Ease In/Out
+    help: 'Follow Video Time: starts and ends the sweep gently.'
+    value: true
+  - name: Progress
+    style: Float
+    default: 0.5
+    clampMin: true
+    clampMax: true
+    help: 'Manual: 0 = no streaks, 1 = whole picture streaked.'
+    value: 0.493
+  - name: Direction
+    style: Menu
+    label: Streak Toward
+    default: right
+    menuNames:
+    - right
+    - left
+    - up
+    - down
+    menuLabels:
+    - Right (cut moves left)
+    - Left (cut moves right)
+    - Up (cut moves down)
+    - Down (cut moves up)
+    help: The side the frozen line is stretched across.
+    value: up
+  Smear:
+  - name: Smoothing
+    style: Float
+    default: 0.5
+    max: 0.99
+    clampMin: true
+    clampMax: true
+    help: 'Temporal lag of the streaks: 0 = the current line exactly, higher = the streaks ease toward it.'
+    value: 0.466
+  - name: Calm
+    style: Float
+    label: Calmer Far Away
+    default: 0.7
+    clampMin: true
+    clampMax: true
+    help: 'Extra lag toward the far edge: 0 = every streak follows the line equally, 1 = the far side barely moves.'
+    value: 0.164
+  - name: Soften
+    style: Float
+    label: Soften Across (px)
+    default: 1.5
+    clampMin: true
+    normMax: 10.0
+    help: Blur across the streaks.
+    value: 3.01
+  - name: Depth
+    style: Float
+    label: Sample Depth (px)
+    default: 3
+    clampMin: true
+    normMax: 20.0
+    help: Pixels behind the cut averaged into the line; steadies flicker.
+    value: 2.2
+  - name: Edge
+    style: Float
+    label: Edge Softness
+    default: 0.003
+    clampMin: true
+    normMax: 0.05
+    help: Width of the blend at the cut, as a fraction of the picture.
+    value: 0.024
+  - name: Reset
+    style: Pulse
+    label: Reset Streaks
+    help: Clears the streak memory.
+flags:
+- viewer
+color: [0.3, 0.5, 0.9]
+tags:
+- tdxn
+operators:
+- name: out1
+  type: outTOP
+  parameters:
+    label: =me.name
+  flags:
+  - viewer
+  position: [1000, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_out
+- name: in_video
+  type: inTOP
+  parameters:
+    label: =me.name
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: null_out
+  type: nullTOP
+  position: [800, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - glsl_async_cut
+- name: constant_rate
+  type: constantCHOP
+  parameters:
+    rate: =me.time.rate
+    autoexportroot: =parent()
+  sequences:
+    const:
+    - name: progress
+      value: =parent().par.Run / parent().par.Duration
+  position: [0, -650]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: feedback_prev
+  type: feedbackTOP
+  parameters:
+    top: glsl_async_cut
+  position: [200, -200]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - in_video
+- name: glsl_async_cut
+  type: glslTOP
+  parameters:
+    pixeldat: glsl_async_cut_pixel
+    computedat: glsl_async_cut_compute
+    format: rgba16float
+  sequences:
+    vec:
+    - name: uCut
+      valuex: '=op(''speed_progress'')[0] if parent().par.Mode == ''auto'' else parent().par.Progress if parent().par.Mode == ''manual'' else (lambda t: t*t*(3-2*t) if parent().par.Ease else t)((lambda p: 1 - abs(2*p - 1) if parent().par.Atend == ''zigzag'' else p)(tdu.clamp((parent().par.Time - parent().par.Start) / max(parent().par.Duration.eval(), 0.001), 0, 1)))'
+      valuey: =parent().par.Edge
+      valuez: =parent().par.Direction.menuIndex
+    - name: uSmear
+      valuex: =parent().par.Smoothing
+      valuey: =parent().par.Calm
+      valuez: =parent().par.Soften
+      valuew: =parent().par.Depth
+  position: [400, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - in_video
+  - feedback_prev
+- name: speed_progress
+  type: speedCHOP
+  parameters:
+    limittype: =parent().par.Atend
+    autoexportroot: =parent()
+  position: [200, -650]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - constant_rate
+- name: reset_callbacks
+  type: parameterexecuteDAT
+  parameters:
+    fromop: =parent()
+    op: ..
+    pars: Reset Restart
+    valuechange: false
+    builtin: false
+    file: project1/async_cut/reset_callbacks.py
+    syncfile: true
+  position: [0, -400]
+  size: [130, 90]
+  color: [0.9, 0.3, 0.4]
+  tags:
+  - py
+- name: glsl_async_cut_info
+  type: infoDAT
+  parameters:
+    op: glsl_async_cut
+  flags:
+  - viewer
+  position: [560, -120]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  dock: glsl_async_cut
+  dat_read_only: true
+- name: glsl_async_cut_pixel
+  type: textDAT
+  parameters:
+    file: project1/async_cut/glsl_async_cut_pixel.glsl
+    syncfile: true
+    language: glsl
+    extension: frag
+  flags:
+  - viewer
+  position: [400, -120]
+  size: [130, 90]
+  color: [0.9, 0.3, 0.4]
+  tags:
+  - glsl
+  dock: glsl_async_cut
+annotations:
+- name: annotate1
+  mode: annotate
+  title: Async cut
+  text: Video in -> glsl_async_cut freezes the line at the cut and streaks it toward one side. feedback_prev feeds the last frame back so the streaks lag (Smoothing), more so far from the cut (Calmer Far Away). constant_rate -> speed_progress moves the cut at a steady speed in Automatic mode.
+  position: [-60, -760]
+  size: [1250, 920]
+  color: [0.45, 0.45, 0.45]

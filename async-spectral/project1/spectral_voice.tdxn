@@ -1,0 +1,339 @@
+format: tdxn
+version: '2.2'
+build: 1
+generator: Embody/6.2.77
+td_build: 099.2025.32820
+network_path: /project1/spectral_voice
+options:
+  include_dat_content: false
+  include_storage: true
+type_defaults:
+  textDAT:
+    parameters:
+      syncfile: true
+    flags:
+    - viewer
+    size: [130, 90]
+    color: [0.9, 0.3, 0.4]
+type: baseCOMP
+custom_pars:
+  Voice:
+  - name: Active
+    style: Toggle
+    startSection: true
+    default: true
+    help: Sound on/off; off glides the partials out while the echoes ring on.
+  - name: Level
+    style: Float
+    default: 0.6
+    clampMin: true
+    normMax: 1.5
+    help: Output level of the beam voice before the soft limiter.
+  - name: Original
+    style: Float
+    label: Original Audio
+    clampMin: true
+    help: Level of the original video audio kept under the beam voice between the fades; 0 = beam voice only.
+  - name: Beams
+    style: Menu
+    label: Beam Direction
+    startSection: true
+    default: vertical
+    menuNames:
+    - vertical
+    - horizontal
+    menuLabels:
+    - Vertical (scan up/down)
+    - Horizontal (scan left/right)
+    help: Direction the streaks run; match it to async_cut Streak Toward (Up/Down = Vertical).
+    value: horizontal
+  - name: Coherence
+    style: Float
+    default: 12
+    clampMin: true
+    normMax: 40.0
+    help: 'How strictly a strip must be streaked to sound: higher = only clean beams sing, lower = live video texture sounds too.'
+    value: 18.8
+  - name: Contrast
+    style: Float
+    default: 2
+    min: 0.25
+    clampMin: true
+    normMax: 4.0
+    help: 'Exponent on beam colour: higher lets the brightest beams dominate, lower makes a denser drone.'
+    value: 1.02
+  - name: Glide
+    style: Float
+    default: 0.85
+    max: 0.995
+    clampMin: true
+    clampMax: true
+    help: 'Per-frame smoothing of the spectrum: 0 = follows every flicker, near 1 = slow swells.'
+  - name: Lowfreq
+    style: Float
+    label: Lowest (Hz)
+    startSection: true
+    default: 55
+    min: 10.0
+    clampMin: true
+    normMin: 20.0
+    normMax: 400.0
+    help: Frequency of the leftmost beam in the red (lowest) band.
+    value: 51
+  - name: Highfreq
+    style: Float
+    label: Highest (Hz)
+    default: 7000
+    min: 100.0
+    clampMin: true
+    normMin: 1000.0
+    normMax: 16000.0
+    help: Frequency of the rightmost beam in the blue (highest) band. Red, green and blue each cover half of the range, overlapping.
+    value: 7735
+  - name: Shimmer
+    style: Float
+    label: Shimmer (cents)
+    default: 8
+    clampMin: true
+    normMax: 50.0
+    help: Slow random pitch drift per partial, in cents; gives the beams a chorus-like life.
+    value: 50
+  - name: Width
+    style: Float
+    label: Stereo Width
+    default: 0.8
+    clampMin: true
+    clampMax: true
+    help: 'Beams pan by position: 0 = mono, 1 = leftmost beam hard left, rightmost hard right.'
+    value: 1
+  - name: Fadein
+    style: Float
+    label: Fade In (s)
+    startSection: true
+    default: 3
+    clampMin: true
+    normMax: 10.0
+    help: Seconds at the start of the video during which the original audio crossfades into the beam voice.
+  - name: Fadeout
+    style: Float
+    label: Fade Out (s)
+    default: 3
+    clampMin: true
+    normMax: 10.0
+    help: Seconds at the end of the video during which the beam voice crossfades back to the original audio.
+  - name: Videotime
+    style: Float
+    label: Video Time
+    help: Seconds into the video; follows the source_deck playhead. Drives the fades.
+    value: =op('source_deck').par.Videotime.eval() if op('source_deck') else 0
+  - name: Videolength
+    style: Float
+    label: Video Length
+    help: Length of the video in seconds; follows the source_deck clip. Drives the fade out.
+    value: =op('source_deck/moviefilein_yt' if op('source_deck').par.Videosource == 'youtube' else 'source_deck/moviefilein').numSeconds if op('source_deck') else 0
+  Space:
+  - name: Reverbmix
+    style: Float
+    label: Reverb Mix
+    startSection: true
+    default: 0.45
+    clampMin: true
+    clampMax: true
+    help: Amount of the feedback-delay-network reverb.
+    value: 0.276
+  - name: Roomsize
+    style: Float
+    label: Room Size
+    default: 0.7
+    clampMin: true
+    clampMax: true
+    help: 'Reverb decay: 0 = about 0.6 s, 1 = about 15 s.'
+    value: 0.914
+  - name: Damping
+    style: Float
+    default: 0.5
+    clampMin: true
+    clampMax: true
+    help: 'High-frequency loss in the reverb tail: higher = darker.'
+  - name: Delaymix
+    style: Float
+    label: Echo Mix
+    startSection: true
+    default: 0.25
+    clampMin: true
+    clampMax: true
+    help: Level of the ping-pong echo.
+    value: 0.423
+  - name: Delaytime
+    style: Float
+    label: Echo Time (s)
+    default: 0.42
+    min: 0.05
+    max: 2.0
+    clampMin: true
+    clampMax: true
+    help: Time between echoes, 0.05-2 s.
+    value: 0.614
+  - name: Delayfeedback
+    style: Float
+    label: Echo Feedback
+    default: 0.45
+    max: 0.95
+    clampMin: true
+    clampMax: true
+    help: How long the echoes repeat.
+    value: 0.551
+  - name: Monitor
+    style: Toggle
+    startSection: true
+    default: true
+    help: Play the beam voice on the default audio device.
+  - name: Monitorvolume
+    style: Float
+    label: Monitor Volume
+    default: 0.8
+    clampMin: true
+    clampMax: true
+    help: Speaker volume of the monitor; does not change the recorded level.
+parameters:
+  parentshortcut: Voice
+color: [0.3, 0.5, 0.9]
+tags:
+- tdxn
+operators:
+- name: in_audio
+  type: inCHOP
+  parameters:
+    label: =me.name
+    autoexportroot: =parent()
+  position: [800, -800]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: in_video
+  type: inTOP
+  parameters:
+    label: =me.name
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: out_audio
+  type: outCHOP
+  parameters:
+    label: =me.name
+    autoexportroot: =parent()
+  position: [2000, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_audio
+- name: glsl_beams
+  type: glslTOP
+  parameters:
+    pixeldat: glsl_beams_pixel
+    premultrgbbyalpha: false
+    outputresolution: custom
+    resolutionw: 64
+    resolutionh: 1
+    format: rgba32float
+  sequences:
+    vec:
+    - name: uBeam
+      valuex: =parent.Voice.par.Beams.menuIndex
+      valuey: =parent.Voice.par.Coherence
+  position: [400, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - in_video
+- name: null_audio
+  type: nullCHOP
+  parameters:
+    autoexportroot: =parent()
+  flags:
+  - viewer
+  position: [1600, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - script_voice
+- name: slice_clock
+  type: audiooscillatorCHOP
+  parameters:
+    amp: 0
+    autoexportroot: =parent()
+  position: [800, -400]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: topto_beams
+  type: toptoCHOP
+  parameters:
+    top: glsl_beams
+    outputcolorspace: passthrough
+    crop: full
+    rate: =me.time.rate
+    autoexportroot: =parent()
+  flags:
+  - viewer
+  position: [800, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: script_voice
+  type: scriptCHOP
+  parameters:
+    callbacks: script_voice_callbacks
+    autoexportroot: =parent()
+  position: [1200, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - slice_clock
+  - topto_beams
+  - in_audio
+- name: audio_monitor
+  type: audiodeviceoutCHOP
+  parameters:
+    active: =parent.Voice.par.Monitor
+    volume: =parent.Voice.par.Monitorvolume
+    autoexportroot: =parent()
+  position: [2000, -400]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_audio
+- name: glsl_beams_info
+  type: infoDAT
+  parameters:
+    op: glsl_beams
+  flags:
+  - viewer
+  position: [475, -120]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  dock: glsl_beams
+  dat_read_only: true
+- name: glsl_beams_pixel
+  type: textDAT
+  parameters:
+    file: project1/spectral_voice/glsl_beams_pixel.glsl
+    language: glsl
+    extension: frag
+  position: [325, -120]
+  tags:
+  - glsl
+  dock: glsl_beams
+- name: script_voice_callbacks
+  type: textDAT
+  parameters:
+    file: project1/spectral_voice/script_voice_callbacks.py
+    language: python
+  position: [1200, -120]
+  tags:
+  - py
+  dock: script_voice
+annotations:
+- name: annotate1
+  mode: annotate
+  title: Beam voice
+  text: 'glsl_beams reduces the streaked picture to 64 frequency bins (rgb = beam colour, a = how much of the strip has become beam). script_voice turns each bin''s red/green/blue into low/mid/high partials (x = pitch, colour x coverage = loudness), then echo + FDN reverb, then crossfades with the source audio: original for the first Fade In and last Fade Out seconds of the video, beam voice in between. slice_clock is a silent 44.1 kHz oscillator that sets the audio block length. out_audio feeds output_deck; audio_monitor plays it.'
+  position: [-70, -870]
+  size: [2270, 1130]
+  color: [0.45, 0.45, 0.45]

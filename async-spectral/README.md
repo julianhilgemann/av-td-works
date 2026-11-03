@@ -15,7 +15,7 @@ The chain runs left to right in `/project1`:
 - `spectral_voice` hears the streaks. A shader cuts the picture into 64 strips, walks each one along the beam direction and keeps what stays the same from sample to sample, the beams; each strip is a place on the frequency axis between Lowest and Highest. Red, green and blue drive three partials an octave band apart (red low, blue high), loud where the colour is bright and the strip has turned into beam. The partial bank goes through a ping-pong echo and an eight-line feedback-delay-network reverb, written in numpy in a Script CHOP. The original sound plays for the first and last few seconds of the video (Fade In, Fade Out) and crossfades into the beam voice in between.
 - `output_deck` (shared module) frames the result for a phone at 9:16 over a blurred copy of itself, adds the watermark, sends it to OBS over Spout/Syphon if asked and records it with its sound to `media/exports/`.
 
-Each project COMP keeps its controls on its own pages: Cut and Smear on `async_cut`, Voice and Space on `spectral_voice`.
+Each project COMP keeps its controls on its own pages: Cut and Smear on `async_cut`, Voice and Space on `spectral_voice`. Embody also saves both as text in `project1/`: `async_cut.tdxn` and `spectral_voice.tdxn` for the networks, and the two shaders and the voice script as `.glsl` and `.py` files beside them.
 
 ## Using another video
 
