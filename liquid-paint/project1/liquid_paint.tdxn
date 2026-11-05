@@ -1,0 +1,255 @@
+format: tdxn
+version: '2.2'
+build: 2
+generator: Embody/6.3.3
+td_build: 099.2025.32820
+network_path: /project1/liquid_paint
+options:
+  include_dat_content: false
+  include_storage: true
+type_defaults:
+  noiseTOP:
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  nullTOP:
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  selectCHOP:
+    parameters:
+      autoexportroot: =parent()
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+type: baseCOMP
+flags:
+- viewer
+color: [0.3, 0.5, 0.9]
+tags:
+- tdxn
+operators:
+- name: out1
+  type: outTOP
+  parameters:
+    label: =me.name
+  flags:
+  - display
+  position: [4000, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_out
+- name: math_uv
+  type: mathCHOP
+  parameters:
+    torange1: -0.5
+    torange2: 0.5
+    autoexportroot: =parent()
+  position: [800, -1600]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - select_uv
+- name: null_out
+  type: nullTOP
+  position: [3600, 0]
+  inputs:
+  - noise_recolor
+- name: opviewer1
+  type: opviewerCOMP
+  parameters:
+    opviewer: null_out
+    interactive: false
+    w: =op('null_out').width
+    h: =op('null_out').height
+    resizecomp: =me
+    repocomp: =me
+  position: [4000, -400]
+  size: [160, 130]
+  color: [0.67, 0.67, 0.67]
+- name: select_uv
+  type: selectCHOP
+  parameters:
+    channames: u v
+  position: [400, -1600]
+  inputs:
+  - panel_mouse
+- name: noise_flow
+  type: noiseTOP
+  parameters:
+    period: 0
+    tz: =absTime.frame
+    rgb: noise
+  position: [2000, -400]
+  inputs:
+  - null_brush
+- name: null_brush
+  type: nullTOP
+  position: [800, 0]
+  inputs:
+  - circle_brush
+- name: null_mouse
+  type: nullCHOP
+  parameters:
+    autoexportroot: =parent()
+  position: [1600, -1200]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - merge_mouse
+- name: glsl_liquid
+  type: glslTOP
+  parameters:
+    pixeldat: glsl_liquid_pixel
+    computedat: glsl_liquid_compute
+    inputextenduv: repeat
+  sequences:
+    vec:
+    - name: uRMB
+      valuex: =op('null_mouse')['rselect']
+    - name: uFrame
+      valuex: =absTime.frame
+      valuey: 1
+      valuez: 1
+      valuew: 1
+  position: [2400, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - composite_brush
+  - noise_flow
+  - null_brush
+- name: merge_mouse
+  type: mergeCHOP
+  parameters:
+    autoexportroot: =parent()
+  position: [1200, -1200]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - select_buttons
+  - math_uv
+- name: noise_paint
+  type: noiseTOP
+  parameters:
+    seed: 7.3
+    period: 0.25
+    mono: false
+    outputresolution: custom
+    resolutionw: 1024
+    resolutionh: 1024
+    format: rgba16float
+- name: panel_mouse
+  type: panelCHOP
+  parameters:
+    component: opviewer1
+    select: lselect rselect u v
+    autoexportroot: =parent()
+  position: [0, -1200]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: circle_brush
+  type: circleTOP
+  parameters:
+    radiusx: 0.05
+    radiusy: 0.05
+    centerx: =op('null_mouse')['u']
+    centery: =op('null_mouse')['v']
+    fillalpha: =op('null_mouse')['lselect']
+    softness: 0.025
+    operand: multiply
+  position: [400, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - noise_paint
+- name: noise_recolor
+  type: noiseTOP
+  parameters:
+    seed: 5
+    period: 15
+    mono: false
+    rgb: noise
+  position: [3200, 0]
+  inputs:
+  - glsl_liquid
+  - glsl_liquid
+- name: select_buttons
+  type: selectCHOP
+  parameters:
+    channames: lselect rselect
+  position: [400, -1200]
+  inputs:
+  - panel_mouse
+- name: composite_brush
+  type: compositeTOP
+  parameters:
+    operand: over
+  position: [2000, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_brush
+  - feedback_canvas
+- name: feedback_canvas
+  type: feedbackTOP
+  parameters:
+    top: glsl_liquid
+  position: [1600, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_brush
+- name: glsl_liquid_info
+  type: infoDAT
+  parameters:
+    op: glsl_liquid
+  flags:
+  - viewer
+  position: [2475, -120]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  dock: glsl_liquid
+  dat_read_only: true
+- name: glsl_liquid_pixel
+  type: textDAT
+  parameters:
+    file: project1/liquid_paint/glsl_liquid_pixel.glsl
+    syncfile: true
+    language: glsl
+    extension: frag
+  flags:
+  - viewer
+  position: [2325, -120]
+  size: [130, 90]
+  color: [0.9, 0.3, 0.4]
+  tags:
+  - glsl
+  dock: glsl_liquid
+annotations:
+- name: annotate1
+  mode: annotate
+  title: Brush
+  text: 'Colour noise seen through a soft circle: the paint. The centre follows the mouse (null_mouse u/v) and fill alpha is the left button, so it only paints while held.'
+  position: [-70, -70]
+  size: [1070, 330]
+  color: [0.25, 0.35, 0.55]
+- name: annotate2
+  mode: annotate
+  title: Liquid Simulation
+  text: 'Feedback loop: the brush is composited over the previous frame, then glsl_liquid advects it (a port of flockaroo''s Spilled). Input 1 = animated static noise for stochastic sampling, input 2 = reset image (right mouse button).'
+  position: [1530, -470]
+  size: [1145, 730]
+  color: [0.45, 0.3, 0.55]
+- name: annotate3
+  mode: annotate
+  title: Recolor and Output
+  text: 'The simulation feeds both noise inputs: input 2 RGBA becomes the per-pixel noise coordinate, remapping the colour. Seed picks the palette, period the smoothness. opviewer1 is the paint surface.'
+  position: [3130, -470]
+  size: [1100, 730]
+  color: [0.3, 0.5, 0.45]
+- name: annotate4
+  mode: annotate
+  title: Mouse Input
+  text: 'Panel CHOP on opviewer1: lselect paints, rselect resets, u/v are remapped from 0..1 to -0.5..0.5 for the circle centre.'
+  position: [-70, -1670]
+  size: [1870, 730]
+  color: [0.5, 0.42, 0.25]

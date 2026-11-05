@@ -1,0 +1,8 @@
+{
+  "convoy": {
+    "declined": true
+  },
+  "envoy": {
+    "enabled": true
+  }
+}
