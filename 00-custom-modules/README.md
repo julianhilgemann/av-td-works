@@ -13,6 +13,7 @@ To turn a feature of a project into a new module, start with `LEARNINGS.md`: the
 | `av-rig/` | The three above wired together, as one drop-in: audio, MIDI, clock and LFOs routed to the project's destinations. Each project keeps its mapping in its own `<rig>_mapping` COMP. | `octatrack-av-setup` |
 | `output-deck/` | Where the picture goes: framed to a screen's size (phone, 4K TV, square, custom) with a soft edge into the background, sent to OBS over Spout or Syphon, and recorded to a movie with its sound or to a GIF, with quality, size and frame rate settings for small files. | `ferroscope`, `async-spectral` |
 | `crt-filter/` | A CRT look for any picture: analog signal faults (jitter, tracking noise, smear, ghosting, grain) and a curved tube with scanlines, a phosphor mask, halation and afterglow, with six preset looks. TOP in, TOP out. | `ferroscope` |
+| `blob-tracker/` | A tracking-overlay look for any picture: boxes, link lines and labels that follow bright, dark, moving or edge regions, or the strongest corners (OpenCV, no blob limit), with the background and the inside of the boxes treated separately. TOP in, TOP out, plus the tracked points as a CHOP. | none yet |
 
 ## Using a module in a project
 

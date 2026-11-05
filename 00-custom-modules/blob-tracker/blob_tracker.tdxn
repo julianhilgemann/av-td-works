@@ -1,0 +1,1032 @@
+format: tdxn
+version: '2.2'
+generator: Embody/6.3.3
+td_build: 099.2025.32820
+options:
+  include_dat_content: false
+  include_storage: true
+type_defaults:
+  constantTOP:
+    parameters:
+      colorb: 0
+      colorg: 0
+      colorr: 0
+      outputresolution: custom
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  feedbackTOP:
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  glslTOP:
+    parameters:
+      premultrgbbyalpha: false
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  infoDAT:
+    flags:
+    - viewer
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  nullTOP:
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+  textDAT:
+    flags:
+    - viewer
+    size: [130, 90]
+    color: [0.67, 0.67, 0.67]
+    tags:
+    - tdxn_exclude:dat_content
+type: baseCOMP
+custom_pars:
+  Tracking:
+  - name: Engine
+    style: Menu
+    default: blobs
+    menuNames:
+    - blobs
+    - features
+    - mediapipe
+    menuLabels:
+    - Blobs (OpenCV)
+    - Features (OpenCV corners)
+    - MediaPipe
+    help: 'What finds the points. Blobs: connected regions of the detection mask (Detect page). Features: strong corners of the picture. MediaPipe: hand, face and pose landmarks from the MediaPipe component named on the MediaPipe page.'
+  - name: Maxpoints
+    style: Int
+    label: Max Points
+    default: 32
+    min: 1.0
+    max: 128.0
+    clampMin: true
+    clampMax: true
+    help: Most points tracked at once (1-128). Blobs keep the largest, Features the strongest corners.
+  - name: Smoothing
+    style: Float
+    startSection: true
+    default: 0.5
+    max: 0.95
+    clampMin: true
+    clampMax: true
+    help: How much of the last position a point keeps each frame. 0 = jumps straight to each detection, 0.9 = glides slowly after it.
+  - name: Maxmove
+    style: Float
+    label: Max Move
+    default: 0.1
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    help: Largest jump in one frame, in frame heights, that still counts as the same point. A detection farther from every point starts a new ID.
+  - name: Hold
+    style: Int
+    label: Hold Frames
+    default: 3
+    max: 30.0
+    clampMin: true
+    normMax: 15.0
+    help: Frames a point stays on screen after its detection is lost, so boxes do not flicker on a missed frame.
+  - name: Minage
+    style: Int
+    label: Min Age
+    default: 2
+    min: 1.0
+    max: 30.0
+    clampMin: true
+    normMax: 10.0
+    help: Frames a point must be tracked before it is drawn. Hides detections that blink for a single frame.
+  - name: Reuseids
+    style: Toggle
+    label: Reuse IDs
+    default: true
+    help: 'A new point takes the lowest free ID, so labels stay short. Off: IDs only count up.'
+  - name: Resettracking
+    style: Pulse
+    label: Reset Tracking
+    startSection: true
+    help: Forget every point (IDs start again at 1) and clear the trails.
+  Detect:
+  - name: Source
+    style: Menu
+    default: bright
+    menuNames:
+    - bright
+    - dark
+    - motion
+    - edges
+    menuLabels:
+    - Bright
+    - Dark
+    - Motion
+    - Edges
+    help: 'What counts as a blob: bright areas, dark areas, pixels that changed since the last frame, or edges. Used by the Blobs engine, and by Features when Corners In Mask is on.'
+  - name: Threshold
+    style: Float
+    default: 0.65
+    clampMin: true
+    clampMax: true
+    help: Detection value above which a pixel joins a blob. Turn on Show Mask to see the effect.
+  - name: Gain
+    style: Float
+    default: 6
+    max: 40.0
+    clampMin: true
+    normMax: 20.0
+    help: Amplifies the Motion and Edges sources before the threshold.
+  - name: Detectsize
+    style: Int
+    label: Detect Size
+    startSection: true
+    default: 320
+    min: 64.0
+    max: 640.0
+    clampMin: true
+    clampMax: true
+    help: Long side in pixels of the small copy the detection runs on. Smaller is faster and merges detail; larger finds smaller blobs.
+  - name: Blur
+    style: Int
+    default: 5
+    max: 30.0
+    clampMin: true
+    normMax: 20.0
+    help: Blur before detection, in detection pixels. Smooths noise into fewer, rounder blobs.
+  - name: Merge
+    style: Int
+    default: 1
+    max: 10.0
+    clampMin: true
+    clampMax: true
+    help: Grows the mask by this many pixels before blobs are counted, joining fragments of one shape.
+  - name: Minarea
+    style: Float
+    label: Min Area
+    default: 0.0004
+    max: 0.05
+    clampMin: true
+    normMax: 0.01
+    help: Smallest blob kept, as a share of the frame area. Raises against specks.
+  - name: Maxarea
+    style: Float
+    label: Max Area
+    default: 0.03
+    clampMin: true
+    clampMax: true
+    help: Largest blob kept, as a share of the frame area. Lower it to drop large background regions.
+  - name: Featurequality
+    style: Float
+    label: Corner Quality
+    startSection: true
+    default: 0.02
+    min: 0.001
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    normMax: 0.2
+    help: 'Features engine: how strong a corner must be, relative to the strongest in the frame. Lower finds more points.'
+  - name: Featuredistance
+    style: Float
+    label: Corner Spacing
+    default: 0.04
+    min: 0.005
+    max: 0.3
+    clampMin: true
+    clampMax: true
+    help: 'Features engine: least distance between two corners, in frame heights.'
+  - name: Featuremask
+    style: Toggle
+    label: Corners In Mask
+    help: 'Features engine: only corners inside the detection mask count, so the points follow the bright, dark or moving parts.'
+  - name: Showmask
+    style: Toggle
+    label: Show Mask
+    startSection: true
+    help: 'Shows the detection copy instead of the effect, for tuning: red = the thresholded mask, green = brightness, blue = the detection value before the threshold.'
+  MediaPipe:
+  - name: Mediapipe
+    style: COMP
+    label: MediaPipe
+    help: The MediaPipe component (MediaPipe.tox) whose landmarks the MediaPipe engine tracks. A name finds a component beside this one.
+  - name: Mphands
+    style: Toggle
+    label: Hands
+    startSection: true
+    default: true
+    help: 'Track the hand landmarks: 21 per hand.'
+  - name: Mpface
+    style: Toggle
+    label: Face
+    default: true
+    help: Track face landmarks, every Face Step-th of the 478.
+  - name: Mppose
+    style: Toggle
+    label: Pose
+    default: true
+    help: 'Track the body pose landmarks: 33 per person.'
+  - name: Mpfacestep
+    style: Int
+    label: Face Step
+    default: 12
+    min: 1.0
+    max: 60.0
+    clampMin: true
+    normMax: 40.0
+    help: Uses every Nth face landmark, so the face does not take every box.
+  - name: Mpminvisibility
+    style: Float
+    label: Min Visibility
+    default: 0.5
+    clampMin: true
+    clampMax: true
+    help: Pose landmarks MediaPipe is less sure of than this are left out.
+  - name: Mpflipx
+    style: Toggle
+    label: Flip X
+    startSection: true
+    help: Mirrors the landmarks left to right, for a mirrored webcam picture.
+  Boxes:
+  - name: Boxstyle
+    style: Menu
+    label: Box Style
+    default: outline
+    menuNames:
+    - outline
+    - corners
+    - dashed
+    - filled
+    - none
+    menuLabels:
+    - Outline
+    - Corners
+    - Dashed
+    - Filled
+    - None
+    help: 'How each box is drawn: a full outline, only its corners, a dashed outline, an outline over a translucent fill, or no box (lines, crosshairs and labels only).'
+  - name: Boxsize
+    style: Menu
+    label: Box Size
+    default: blob
+    menuNames:
+    - blob
+    - fixed
+    - random
+    menuLabels:
+    - Blob Bounds
+    - Fixed
+    - Random per ID
+    help: 'Blob Bounds: the detected shape (points without a size use Fixed Size). Fixed: every box the same. Random per ID: each point keeps its own size between Random Min and Random Max.'
+  - name: Boxscale
+    style: Float
+    label: Box Scale
+    default: 1
+    min: 0.1
+    max: 4.0
+    clampMin: true
+    normMax: 3.0
+    help: 'Blob Bounds: multiplies the detected size.'
+  - name: Boxpad
+    style: Float
+    label: Box Padding
+    default: 4
+    max: 60.0
+    clampMin: true
+    normMax: 30.0
+    help: 'Blob Bounds: pixels added on every side.'
+  - name: Fixedsize
+    style: Float
+    label: Fixed Size
+    default: 0.05
+    min: 0.005
+    max: 0.5
+    clampMin: true
+    normMax: 0.2
+    help: Side of a Fixed box, in frame heights.
+  - name: Randommin
+    style: Float
+    label: Random Min
+    default: 0.02
+    min: 0.005
+    max: 0.5
+    clampMin: true
+    normMax: 0.2
+    help: Smallest Random per ID box side, in frame heights.
+  - name: Randommax
+    style: Float
+    label: Random Max
+    default: 0.12
+    min: 0.005
+    max: 0.5
+    clampMin: true
+    normMax: 0.3
+    help: Largest Random per ID box side, in frame heights.
+  - name: Boxmin
+    style: Float
+    label: Min Box
+    default: 10
+    max: 200.0
+    clampMin: true
+    normMax: 80.0
+    help: No box is smaller than this many pixels on a side.
+  - name: Square
+    style: Toggle
+    help: Makes every box square (its longer side).
+  - name: Boxwidth
+    style: Float
+    label: Line Width
+    startSection: true
+    default: 1.5
+    min: 0.5
+    max: 12.0
+    clampMin: true
+    normMax: 6.0
+    help: Width of the box lines in pixels.
+  - name: Cornerlength
+    style: Float
+    label: Corner Length
+    default: 0.25
+    min: 0.05
+    max: 0.5
+    clampMin: true
+    clampMax: true
+    help: 'Corners style: length of each corner mark, as a share of the side.'
+  - name: Dashlength
+    style: Float
+    label: Dash Length
+    default: 5
+    min: 1.0
+    max: 50.0
+    clampMin: true
+    normMax: 20.0
+    help: 'Dashed style: length of each dash in pixels.'
+  - name: Fillalpha
+    style: Float
+    label: Fill Alpha
+    default: 0.15
+    clampMin: true
+    clampMax: true
+    help: 'Filled style: opacity of the fill.'
+  - name: Boxcolor
+    style: RGBA
+    label: Box Color
+    size: 3
+    startSection: true
+    default: 1
+    help: Colour of boxes, crosshairs and centre dots.
+  - name: Boxalpha
+    style: Float
+    label: Box Alpha
+    default: 1
+    clampMin: true
+    clampMax: true
+    help: Opacity of boxes, crosshairs and centre dots.
+  - name: Crosshair
+    style: Float
+    startSection: true
+    max: 100.0
+    clampMin: true
+    normMax: 40.0
+    help: Half-length in pixels of a cross at each point. 0 = none.
+  - name: Centerdot
+    style: Float
+    label: Centre Dot
+    max: 20.0
+    clampMin: true
+    normMax: 10.0
+    help: Radius in pixels of a dot at each point. 0 = none.
+  Lines:
+  - name: Linemode
+    style: Menu
+    label: Line Mode
+    default: nearest
+    menuNames:
+    - 'off'
+    - nearest
+    - proximity
+    - chain
+    - hub
+    menuLabels:
+    - 'Off'
+    - Nearest
+    - Proximity
+    - Chain (by ID)
+    - Hub (first point)
+    help: 'Which points are linked. Nearest: each to its Links Per Point closest. Proximity: every pair closer than Link Distance. Chain: in ID order. Hub: the oldest point to all others.'
+  - name: Linkdistance
+    style: Float
+    label: Link Distance
+    default: 0.35
+    max: 2.5
+    clampMin: true
+    help: Longest line drawn, in frame heights. Applies to every mode.
+  - name: Linksperpoint
+    style: Int
+    label: Links Per Point
+    default: 2
+    min: 1.0
+    max: 8.0
+    clampMin: true
+    clampMax: true
+    help: 'Nearest mode: how many neighbours each point links to.'
+  - name: Linewidth
+    style: Float
+    label: Line Width
+    startSection: true
+    default: 1
+    min: 0.5
+    max: 8.0
+    clampMin: true
+    normMax: 4.0
+    help: Width of the link lines in pixels.
+  - name: Linedash
+    style: Float
+    label: Dash Length
+    max: 40.0
+    clampMin: true
+    normMax: 20.0
+    help: Length of the dashes in pixels. 0 = solid lines.
+  - name: Linefade
+    style: Toggle
+    label: Fade With Length
+    default: true
+    help: Longer lines are fainter, fading out at Link Distance.
+  - name: Linecolor
+    style: RGBA
+    label: Line Color
+    size: 3
+    startSection: true
+    default: 1
+    help: Colour of the link lines.
+  - name: Linealpha
+    style: Float
+    label: Line Alpha
+    default: 0.6
+    clampMin: true
+    clampMax: true
+    help: Opacity of the link lines.
+  Labels:
+  - name: Labelmode
+    style: Menu
+    label: Label
+    default: idcoords
+    menuNames:
+    - 'off'
+    - id
+    - coords
+    - size
+    - idcoords
+    - hex
+    - conf
+    menuLabels:
+    - 'Off'
+    - ID
+    - Coordinates
+    - Size (px)
+    - ID + Coordinates
+    - Hex Code
+    - Confidence
+    help: 'Text beside each box: its ID, its centre (0-1), its size in pixels, ID and centre, a hex code made from the ID, or the detection strength.'
+  - name: Labelposition
+    style: Menu
+    label: Position
+    default: above
+    menuNames:
+    - above
+    - inside
+    - below
+    - center
+    menuLabels:
+    - Above
+    - Inside
+    - Below
+    - Centre
+    help: 'Where the text sits: above the top-left corner, inside it, below the bottom-left corner, or centred on the point.'
+  - name: Labelsize
+    style: Float
+    label: Size
+    default: 11
+    min: 6.0
+    max: 64.0
+    clampMin: true
+    normMax: 32.0
+    help: Font size of the labels in pixels (PT Mono).
+  - name: Labeloffset
+    style: XYZW
+    label: Offset
+    size: 2
+    default: [0, 3]
+    help: Moves every label by this many pixels (x right, y up).
+  - name: Labelcolor
+    style: RGBA
+    label: Color
+    size: 3
+    startSection: true
+    default: 1
+    help: Colour of the labels.
+  - name: Labelalpha
+    style: Float
+    label: Alpha
+    default: 0.9
+    clampMin: true
+    clampMax: true
+    help: Opacity of the labels.
+  Look:
+  - name: Background
+    style: Menu
+    default: mono
+    menuNames:
+    - original
+    - mono
+    - threshold
+    - invert
+    - black
+    menuLabels:
+    - Original
+    - Monochrome
+    - Threshold
+    - Inverted
+    - Black
+    help: How the picture behind the boxes is shown.
+  - name: Brightness
+    style: Float
+    default: 0.8
+    max: 3.0
+    clampMin: true
+    normMax: 2.0
+    help: Brightness of the background picture.
+  - name: Contrast
+    style: Float
+    default: 1.2
+    max: 4.0
+    clampMin: true
+    normMax: 3.0
+    help: Contrast of the background picture around mid grey.
+  - name: Saturation
+    style: Float
+    default: 1
+    max: 3.0
+    clampMin: true
+    normMax: 2.0
+    help: Colour saturation of the background (Original and Inverted).
+  - name: Bgthreshold
+    style: Float
+    label: Background Threshold
+    default: 0.5
+    clampMin: true
+    clampMax: true
+    help: 'Threshold background: brightness where black turns white.'
+  - name: Inside
+    style: Menu
+    label: Inside Boxes
+    default: invert
+    menuNames:
+    - none
+    - original
+    - invert
+    - threshold
+    - tint
+    - pixelate
+    - zoom
+    menuLabels:
+    - None
+    - Original Colour
+    - Invert
+    - Threshold
+    - Tint
+    - Pixelate
+    - Zoom
+    help: 'Effect on the picture inside each box: the untouched colour picture, inverted, black and white, tinted, pixelated, or magnified.'
+  - name: Insideamount
+    style: Float
+    label: Inside Amount
+    startSection: true
+    default: 1
+    clampMin: true
+    clampMax: true
+    help: 'Strength of the inside effect: 0 = none, 1 = full.'
+  - name: Insidethreshold
+    style: Float
+    label: Inside Threshold
+    default: 0.5
+    clampMin: true
+    clampMax: true
+    help: 'Threshold inside effect: brightness where black turns white.'
+  - name: Pixelsize
+    style: Float
+    label: Pixel Size
+    default: 8
+    min: 1.0
+    max: 64.0
+    clampMin: true
+    normMax: 32.0
+    help: 'Pixelate inside effect: size of the blocks in pixels.'
+  - name: Zoom
+    style: Float
+    default: 1.8
+    min: 0.25
+    max: 8.0
+    clampMin: true
+    normMax: 4.0
+    help: 'Zoom inside effect: magnification around the point.'
+  - name: Tint
+    style: RGBA
+    size: 3
+    default: [1, 0.25, 0.2]
+    help: 'Tint inside effect: the colour.'
+  - name: Trails
+    style: Float
+    startSection: true
+    max: 0.98
+    clampMin: true
+    clampMax: true
+    help: How much of the last frame's boxes and lines stays, as a fading trail. 0 = none.
+  Module:
+  - name: Savemodule
+    style: Pulse
+    label: Save Module
+    help: 'Save this tracker as the shared module: a clean copy (no bindings to the host, default values) goes to the External .tox Path on the Common page, with readable text versions beside it when Embody is in the project. Every project that loads that .tox picks the change up the next time it opens.'
+parameters:
+  parentshortcut: BlobTracker
+flags:
+- -allowCooking
+color: [0.67, 0.67, 0.67]
+operators:
+- name: out1
+  type: outTOP
+  parameters:
+    label: =me.name
+  flags:
+  - display
+  position: [6800, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_out
+- name: in_video
+  type: inTOP
+  parameters:
+    label: =me.name
+  position: [400, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - constant_nosignal
+- name: null_out
+  type: nullTOP
+  position: [6400, 0]
+  inputs:
+  - switch_view
+- name: glsl_look
+  type: glslTOP
+  parameters:
+    pixeldat: glsl_look_pixel
+    computedat: glsl_look_compute
+  sequences:
+    color:
+    - name: uTint
+      rgbr: =parent.BlobTracker.par.Tintr
+      rgbg: =parent.BlobTracker.par.Tintg
+      rgbb: =parent.BlobTracker.par.Tintb
+    vec:
+    - name: uBg
+      valuex: =parent.BlobTracker.par.Background.menuIndex
+      valuey: =parent.BlobTracker.par.Brightness
+      valuez: =parent.BlobTracker.par.Contrast
+      valuew: =parent.BlobTracker.par.Saturation
+    - name: uInside
+      valuex: =parent.BlobTracker.par.Inside.menuIndex
+      valuey: =parent.BlobTracker.par.Insideamount
+      valuez: =parent.BlobTracker.par.Pixelsize
+      valuew: =parent.BlobTracker.par.Zoom
+    - name: uLevels
+      valuex: =parent.BlobTracker.par.Bgthreshold
+      valuey: =parent.BlobTracker.par.Insidethreshold
+      valuez: 1
+      valuew: 1
+  position: [5200, 0]
+  inputs:
+  - null_video
+  - choptotop_points
+  - glsl_overlay
+- name: glsl_mask
+  type: glslTOP
+  parameters:
+    pixeldat: glsl_mask_pixel
+    computedat: glsl_mask_compute
+    format: rgba8fixed
+  sequences:
+    vec:
+    - name: uDetect
+      valuex: =parent.BlobTracker.par.Source.menuIndex
+      valuey: =parent.BlobTracker.par.Threshold
+      valuez: =parent.BlobTracker.par.Gain
+  position: [2400, -800]
+  inputs:
+  - blur_detect
+  - feedback_prev
+- name: null_mask
+  type: nullTOP
+  position: [2800, -800]
+  inputs:
+  - glsl_mask
+- name: null_video
+  type: nullTOP
+  position: [800, 0]
+  inputs:
+  - in_video
+- name: out_points
+  type: outCHOP
+  parameters:
+    label: =me.name
+    autoexportroot: =parent()
+  position: [4000, -2400]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_points
+- name: res_detect
+  type: resolutionTOP
+  parameters:
+    outputresolution: custom
+    resolutionw: =max(1, round(me.inputs[0].width * min(1.0, parent.BlobTracker.par.Detectsize / max(me.inputs[0].width, me.inputs[0].height, 1))))
+    resolutionh: =max(1, round(me.inputs[0].height * min(1.0, parent.BlobTracker.par.Detectsize / max(me.inputs[0].width, me.inputs[0].height, 1))))
+  position: [1200, -800]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - null_video
+- name: blur_detect
+  type: blurTOP
+  parameters:
+    size: =parent.BlobTracker.par.Blur
+  position: [1600, -800]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - res_detect
+- name: null_points
+  type: nullCHOP
+  parameters:
+    autoexportroot: =parent()
+  position: [3600, -2000]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - script_points
+- name: switch_view
+  type: switchTOP
+  parameters:
+    index: =parent.BlobTracker.par.Showmask
+  position: [6000, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - composite_labels
+  - null_mask
+- name: text_labels
+  type: textTOP
+  parameters:
+    specdat: script_labels
+    text: ''
+    fontfile: =app.samplesFolder + '/Fonts/PTMono-Regular.ttf'
+    fontsizex: =parent.BlobTracker.par.Labelsize
+    fontsizexunit: pixels
+    fontsizey: =parent.BlobTracker.par.Labelsize
+    fontsizeyunit: pixels
+    fontcolorr: =parent.BlobTracker.par.Labelcolorr
+    fontcolorg: =parent.BlobTracker.par.Labelcolorg
+    fontcolorb: =parent.BlobTracker.par.Labelcolorb
+    fontalpha: =parent.BlobTracker.par.Labelalpha
+    outputresolution: custom
+    resolutionw: =op('null_video').width
+    resolutionh: =op('null_video').height
+  position: [5200, -400]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: glsl_overlay
+  type: glslTOP
+  parameters:
+    pixeldat: glsl_overlay_pixel
+    computedat: glsl_overlay_compute
+    outputresolution: custom
+    resolutionw: =op('null_video').width
+    resolutionh: =op('null_video').height
+    format: rgba16float
+  sequences:
+    color:
+    - name: uBoxColor
+      rgbr: =parent.BlobTracker.par.Boxcolorr
+      rgbg: =parent.BlobTracker.par.Boxcolorg
+      rgbb: =parent.BlobTracker.par.Boxcolorb
+      alpha: =parent.BlobTracker.par.Boxalpha
+    - name: uLineColor
+      rgbr: =parent.BlobTracker.par.Linecolorr
+      rgbg: =parent.BlobTracker.par.Linecolorg
+      rgbb: =parent.BlobTracker.par.Linecolorb
+      alpha: =parent.BlobTracker.par.Linealpha
+    vec:
+    - name: uBox
+      valuex: =parent.BlobTracker.par.Boxstyle.menuIndex
+      valuey: =parent.BlobTracker.par.Boxwidth
+      valuez: =parent.BlobTracker.par.Cornerlength
+      valuew: =parent.BlobTracker.par.Fillalpha
+    - name: uMarks
+      valuex: =parent.BlobTracker.par.Crosshair
+      valuey: =parent.BlobTracker.par.Centerdot
+      valuez: =parent.BlobTracker.par.Dashlength
+      valuew: =parent.BlobTracker.par.Trails
+    - name: uLine
+      valuex: =parent.BlobTracker.par.Linewidth
+      valuey: =parent.BlobTracker.par.Linefade
+      valuez: =parent.BlobTracker.par.Linkdistance
+      valuew: =parent.BlobTracker.par.Linedash
+  position: [4800, 0]
+  inputs:
+  - choptotop_points
+  - feedback_trails
+- name: constant_tick
+  type: constantCHOP
+  parameters:
+    rate: =me.time.rate
+    autoexportroot: =parent()
+  sequences:
+    const:
+    - name: frame
+      value: =absTime.frame
+  position: [2800, -2000]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: feedback_prev
+  type: feedbackTOP
+  parameters:
+    top: blur_detect
+  position: [2000, -1200]
+  inputs:
+  - blur_detect
+- name: script_labels
+  type: scriptDAT
+  parameters:
+    callbacks: script_labels_callbacks
+  position: [4400, -2800]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - choptodat_points
+  dat_read_only: true
+- name: script_points
+  type: scriptCHOP
+  parameters:
+    callbacks: script_points_callbacks
+    autoexportroot: =parent()
+  position: [3200, -2000]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - constant_tick
+- name: constant_clear
+  type: constantTOP
+  parameters:
+    alpha: 0
+    resolutionw: 64
+    resolutionh: 64
+    format: rgba16float
+  position: [4000, 600]
+- name: glsl_look_info
+  type: infoDAT
+  parameters:
+    op: glsl_look
+  position: [5275, -120]
+  dock: glsl_look
+  dat_read_only: true
+- name: glsl_mask_info
+  type: infoDAT
+  parameters:
+    op: glsl_mask
+  position: [2475, -920]
+  dock: glsl_mask
+  dat_read_only: true
+- name: feedback_trails
+  type: feedbackTOP
+  parameters:
+    top: glsl_overlay
+  position: [4400, 600]
+  inputs:
+  - constant_clear
+- name: glsl_look_pixel
+  type: textDAT
+  parameters:
+    language: glsl
+    extension: frag
+  position: [5125, -120]
+  dock: glsl_look
+- name: glsl_mask_pixel
+  type: textDAT
+  parameters:
+    language: glsl
+    extension: frag
+  position: [2325, -920]
+  dock: glsl_mask
+- name: choptodat_points
+  type: choptoDAT
+  parameters:
+    chop: null_points
+  position: [4000, -2800]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  dat_read_only: true
+- name: choptotop_points
+  type: choptoTOP
+  parameters:
+    chop: null_points
+    dataformat: rgba
+    format: rgba32float
+  position: [4000, -2000]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+- name: composite_labels
+  type: compositeTOP
+  parameters:
+    operand: over
+  position: [5600, 0]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  inputs:
+  - text_labels
+  - glsl_look
+- name: module_callbacks
+  type: parameterexecuteDAT
+  parameters:
+    fromop: =parent()
+    op: ..
+    pars: Resettracking Savemodule
+    valuechange: false
+    builtin: false
+  position: [0, -1600]
+  size: [130, 90]
+  color: [0.67, 0.67, 0.67]
+  tags:
+  - tdxn_exclude:dat_content
+- name: constant_nosignal
+  type: constantTOP
+  parameters:
+    resolutionw: 1280
+    resolutionh: 720
+- name: glsl_overlay_info
+  type: infoDAT
+  parameters:
+    op: glsl_overlay
+  position: [4875, -120]
+  dock: glsl_overlay
+  dat_read_only: true
+- name: glsl_overlay_pixel
+  type: textDAT
+  parameters:
+    language: glsl
+    extension: frag
+  position: [4725, -120]
+  dock: glsl_overlay
+- name: script_labels_callbacks
+  type: textDAT
+  parameters:
+    language: python
+  position: [4400, -2920]
+  dock: script_labels
+- name: script_points_callbacks
+  type: textDAT
+  parameters:
+    language: python
+  position: [3200, -2120]
+  dock: script_points
+annotations:
+- name: annotate1
+  mode: annotate
+  title: Input
+  text: The video coming in. constant_nosignal shows black when nothing is wired to the module.
+  position: [-70, -70]
+  size: [1070, 330]
+  color: [0.3, 0.4, 0.5]
+- name: annotate2
+  mode: annotate
+  title: Detection
+  text: 'A small, blurred copy of the video becomes a mask: bright, dark, moving or edge pixels above Threshold. feedback_prev holds the last frame for Motion.'
+  position: [1130, -1270]
+  size: [1870, 730]
+  color: [0.45, 0.35, 0.25]
+- name: annotate3
+  mode: annotate
+  title: Tracking
+  text: script_points turns OpenCV blobs or corners, or MediaPipe landmarks, into tracked points with stable IDs, box sizes and links (one sample per slot). choptotop_points hands them to the shaders, out_points to the host, script_labels writes the label text.
+  position: [2730, -2990]
+  size: [1870, 1250]
+  color: [0.3, 0.45, 0.3]
+- name: annotate4
+  mode: annotate
+  title: Render
+  text: glsl_overlay draws boxes, crosshairs and lines with trails; glsl_look treats the background and the inside of the boxes and lays the overlay on top; text_labels adds the labels. Show Mask switches to the detection view.
+  position: [3930, -470]
+  size: [3070, 1330]
+  color: [0.5, 0.3, 0.45]
+- name: annotate5
+  mode: annotate
+  title: Module
+  text: Reset Tracking and Save Module.
+  position: [-70, -1670]
+  size: [270, 330]
+  color: [0.35, 0.35, 0.35]
