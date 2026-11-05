@@ -4,6 +4,8 @@ Painting with the mouse into a single-pass fluid: every stroke smears into dripp
 
 <img src="preview.jpg" width="270" alt="Liquid paint, rendered in TouchDesigner">
 
+Open `liquid-paint.toe` in TouchDesigner 2025.
+
 Built along Jack DiLaura's [Generative Liquid Paintings in TouchDesigner](https://www.youtube.com/watch?v=OfHx9OTx5p4) (The Interactive & Immersive HQ, TouchDesigner Tutorial 144). The fluid is Buffer A of flockaroo's [single pass CFD](https://www.shadertoy.com/view/MdKXRy) (Shadertoy, 2016), ported to TouchDesigner. The network is the COMP `/project1/liquid_paint`, built in TouchDesigner 2025.32820.
 
 ## Painting
