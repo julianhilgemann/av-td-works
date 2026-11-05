@@ -13,6 +13,7 @@ Audiovisual TouchDesigner works. Each folder is a standalone project: open the `
 | [`color-ribbon-butterfly/`](color-ribbon-butterfly/README.md) | 250,000 instanced hexagons placed by animated 4D simplex noise, smeared into colored ribbons by feedback, RGBA delay and a radial blur. |
 | [`infinite-hypercube/`](infinite-hypercube/README.md) | 262,144 points carried by a self-displacing noise field inside a cube whose faces wrap around, with trails, depth blur and RGBA delay. |
 | [`iridiscent-viz/`](iridiscent-viz/README.md) | A music visualizer: a turbulent particle stream lit by an audio track (kick to bloom, rhythm to glow, highs to color and rotation), with feedback, mirroring and tiling. |
+| [`liquid-paint/`](liquid-paint/README.md) | Mouse painting into a single-pass fluid shader: strokes smear into dripping, marbled trails, recoloured through a Noise TOP. |
 | [`noise-attractor-landscape/`](noise-attractor-landscape/README.md) | A GPU particle swarm in turbulence, wind and force fields, with three presets of each spread across the swarm. |
 | [`octatrack-av-setup/`](octatrack-av-setup/README.md) | The live AV set: an Elektron Octatrack drives a noise-field particle generator, out at 1920×1080 over Syphon/Spout. |
 | `octatrack-audio-modulation/` | An Octatrack sketch: audio and MIDI read in and shaped, with a million instanced points still moved by LFOs. |
